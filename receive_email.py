@@ -29,7 +29,7 @@ class ReceiveEmail(InboundMailHandler):
             split_email = re.split(reply_pattern, content)
             content = split_email[0]
 
-            create_or_replace_snippet(user, content, date_for_new_snippet())
+            create_or_replace_snippet(user, content, date_for_retrieval())
 
 
 def main():
