@@ -1,10 +1,59 @@
-Snippets is a process that has been used internally at Google for team communication and collaboration. 
-It was developed to address the familiar problem that, for a team to work together effectively, members 
-need to keep up-to-date with what everyone else is working on. Rather than handling this problem with 
-long meetings or micromanagement, Snippets takes a different approach. Every Sunday, an email is sent 
-out to all team members asking them to reply with a bullet list summarizing what they did last week 
-and what they plan to work on in the current week. These lists, termed snippets, are automatically 
-compiled and emailed out the following day to the entire team. The snippets are also saved to a 
-database that anyone on the team can browse using a web app. The result is that any team member can 
-quickly get a general overview of what's going on, such as a project's status or what others are doing, 
-without disrupting flow.
+(A) What Are Snippets?
+
+Snippets is a process that has been used internally at Google for team communication and collaboration. It was developed to address the familiar problem that, for a team to work together effectively, members need to keep up-to-date with what everyone else is working on.
+Rather than handling this problem with long meetings or micromanagement, Snippets takes a different approach. Every Sunday, an email is sent out to all team members asking them to reply with a bullet list summarizing what they did last week and what they plan to work on in the current week. These lists, termed snippets, are automatically compiled and emailed out the following day to the entire team. The snippets are also saved to a database that anyone on the team can browse using a web app. The result is that any team member can quickly get a general overview of what's going on, such as a project's status or what others are doing, without disrupting flow [RM2].
+
+
+(B) Architecture
+
+On the Email Workflow side [RM2]:
+1. An email is sent out on Friday evening reminding all team members to send in their bullet lists
+2. Each member replies to the reminder email with his list.
+3. When an individual reply is received, the bullet list is parsed out from the email and saved to the database
+4. Each member's list for the current week is compiled and sent out as a digest email on Monday morning to the entire team
+
+The Front-Facing Web App provides a simple interface to [RM2]:
+1. See a list of all team members
+2. View a single team member's profile page containing her snippets organized in reverse chronological order
+3. Follow a team member so that you receive her snippets in your digest email
+
+
+(C) Code, Implementation, Testing, And Deployment
+
+The Google App Engine based code for this project can be found on Git Hub at https://github.com/n007/snippets
+
+You can follow design and implementation blurb on this page to gain more insights: http://tech.pro/blog/1490/how-it-works-google-s-snippets
+
+A local testing and staging environment for this project can be setup by following instructions on this google developer appengine page: https://console.developers.google.com/start/appengine
+
+
+
+(D) Feature/Task Roadmap
+1. Make my app specific changes
+2. Change cron timings to daily and then to Friday/Monday
+3. Move to PST
+4. Send self sufficient text in reminder email
+5. Send digest for self subscription
+6. Handle rocketfuelinc/rocketfuel email address seamlessly
+7. Remind again if not replied, skip if already replied
+8. Add Rocket Fuel Domain
+9. Auto remove text other than bulleted list of items
+10. Allow to put Monday date in the subject line to override and backfill
+11. Avoid someone overriding with empty list
+12. Make code more parametrized than hard coded links and limits
+13. UI enhancements
+14. Upgrade to Python 2.7
+
+
+(E) References
+Reading Material
+http://blog.idonethis.com/post/16736314554/silicon-valleys-productivity-secret
+http://tech.pro/blog/1490/how-it-works-google-s-snippets
+http://blog.idonethis.com/post/61676040059/why-google-snippets
+http://blogoscoped.com/archive/2008-03-12-n39.html
+http://billandkaren.net/blog/?p=386
+
+Code Material
+https://code.google.com/p/soic-snippets/
+https://blog.weekdone.com/tag/google-snippets/
+https://github.com/kushal/snippets

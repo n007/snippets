@@ -23,7 +23,8 @@ def compute_following(current_user, users):
     """Return set of email addresses being followed by this user."""
     email_set = set(current_user.following)
     tag_set = set(current_user.tags_following)
-    following = set()
+    # Always self follower
+    following = set(current_user.email)
     for u in users:
         if ((u.email in email_set) or
             (len(tag_set.intersection(u.tags)) > 0)):
