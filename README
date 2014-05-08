@@ -1,6 +1,10 @@
-Every week, the system emails out a reminder email. Users can reply to
-it with what they did that week. Users can follow other users via the
-web, as well as following tags, and assigning tags to themselves. All
-content matching the tags they follow will be mailed to them in a
-digest every Monday afternoon. In addition, archives for each user and
-the most recent data for each tag are visible on the web.
+Snippets is a process that has been used internally at Google for team communication and collaboration. 
+It was developed to address the familiar problem that, for a team to work together effectively, members 
+need to keep up-to-date with what everyone else is working on. Rather than handling this problem with 
+long meetings or micromanagement, Snippets takes a different approach. Every Sunday, an email is sent 
+out to all team members asking them to reply with a bullet list summarizing what they did last week 
+and what they plan to work on in the current week. These lists, termed snippets, are automatically 
+compiled and emailed out the following day to the entire team. The snippets are also saved to a 
+database that anyone on the team can browse using a web app. The result is that any team member can 
+quickly get a general overview of what's going on, such as a project's status or what others are doing, 
+without disrupting flow.

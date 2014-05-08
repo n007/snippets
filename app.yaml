@@ -4,7 +4,7 @@ runtime: python
 api_version: 1
 
 handlers:
-- url: /_ah/mail/snippets@.*noted-tesla-574\.appspot\.com
+- url: /_ah/mail/snippets@.*noted-tesla-574\.appspotmail\.com
   script: receive_email.py
   login: admin
 

@@ -24,7 +24,7 @@ class ReminderEmail(webapp.RequestHandler):
 
 class OneReminderEmail(webapp.RequestHandler):
     def post(self):
-        mail.send_mail(sender="snippets <snippets@noted-tesla-574.appspot.com>",
+        mail.send_mail(sender="snippets <snippets@noted-tesla-574.appspotmail.com>",
                        to=self.request.get('email'),
                        subject="Snippet time!",
                        body=REMINDER)
@@ -41,7 +41,7 @@ class DigestEmail(webapp.RequestHandler):
 
 class OneDigestEmail(webapp.RequestHandler):
     def __send_mail(self, recipient, body):
-        mail.send_mail(sender="snippets <snippets@noted-tesla-574.appspot.com>",
+        mail.send_mail(sender="snippets <snippets@noted-tesla-574.appspotmail.com>",
                        to=recipient,
                        subject="Snippet delivery!",
                        body=body)
