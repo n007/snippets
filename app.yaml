@@ -1,10 +1,10 @@
-application: fssnippets
+application: snippets
 version: 1
 runtime: python
 api_version: 1
 
 handlers:
-- url: /_ah/mail/snippets@.*fssnippets\.appspotmail\.com 
+- url: /_ah/mail/snippets@.*noted-tesla-574\.appspot\.com
   script: receive_email.py
   login: admin
 
