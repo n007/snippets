@@ -32,6 +32,8 @@ def compute_following(current_user, users):
     return following            
     
 def user_from_email(email):
+    #handle emails from rocketfuel.com
+    email = email.replace("rocketfuel.com","rocketfuelinc.com",1);
     return User.all().filter("email =", email).fetch(1)[0]
     
 def create_or_replace_snippet(user, text, date):
