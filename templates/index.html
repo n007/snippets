@@ -4,12 +4,12 @@
 
 <h2><a href="/user/{{ current_user.email }}" style="text-decoration:none;">welcome {{ current_user.pretty_name }}</a></h2>
 
-manage your profile 
+<ul><li type=circle>manage your profile 
 	 <a class="light" href="/user/{{ current_user.email }}" style="font-size: 75%">
-			( logged in as: {{ current_user.email }} )</a><br/><br>
+			( logged in as: {{ current_user.email }} )</a></li></ul>
 <table>
 	<tr>
-    <td><div style="width: 10px"></div></td>
+    <td><div style="width: 35px"></div></td>
 	<td style="font-size: 75%">
     {% if current_user.enabled %}
        ✓ currently snippets are enabled  (<a class="light" href="?setenabled=0"> disable it </a>)
@@ -38,10 +38,12 @@ manage your profile
     </td></tr>
 </table>
 
-    <br/></br>
-    send your snippets to <a class="light" href="mailto:snippets@noted-tesla-574.appspotmail.com?Subject=Snippet%20time" target="_top">
-		this snippet alias</a> by monday morning!
-    <br/>
+	<ul>
+    <li type=circle>send your snippets by monday morning to <a class="light" href="mailto:snippets@noted-tesla-574.appspotmail.com?Subject=Snippet%20time" target="_top">
+		this snippet alias</a></li><br/>
+	<li type=circle>learn more about backend of this project from 
+		<a class="light" href="https://docs.google.com/a/rocketfuelinc.com/document/d/1npaScAPm-Y8-w1x5ZpVmpsC-n-XchPZSk95ShOkgKaQ">this document</a></li>
+    </ul>
 	   
     <table cellspacing=20>
       <tr>
