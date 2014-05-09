@@ -3,8 +3,8 @@
 {% block body %}
 
   <div style="float: left; width: 300px">
-    <h2>{{ user.email }}</h2>
-
+	<h2>users</h2>
+	{{ user.email }}&nbsp;
     {% if following %}
       ✓ <a class="light" href="/unfollow?user={{ user.email }}&continue=/user/{{ user.email }}">unfollow</a>
     {% else %}
@@ -12,18 +12,18 @@
     {% endif %}
 
     <br/></br>
-    <b>Tags</b><br/>
+	
+    <h2>groups</h2>
     {% for tag in tags %}
-        {{ tag.0 }}
+        {{ tag.0 }}&nbsp;
 		    {% if tag.1 %}
 		      ✓ <a class="light" href="/unfollow?tag={{ tag.0 }}&continue=/user/{{ user.email }}">unfollow</a>
 		    {% else %}
 		      <a class="light" href="/follow?tag={{ tag.0 }}&continue=/user/{{ user.email }}">follow</a>
 		    {% endif %}
-        <br/>
     {% endfor %}
-
   </div>
+  
   <div style="float: left; margin-left: 30px; max-width: 600px">
     {% for snippet in snippets %}
       <b>{{ snippet.date }}</b><br/>

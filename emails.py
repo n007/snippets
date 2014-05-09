@@ -15,20 +15,7 @@ Hey Rokcet Fuel Nerd,
 Folks want to know what you're up to. Don't leave 'em hanging. Please send a bulleted list of your work item from this week on their way.
 (Please remove your signature and any original text in the reply. Just keep the bulleted list.)
 
-This is not a spam! Abhijit Pol is the current owner of this project.
-
-Snippets is a process that has been used internally at Google for team communication and collaboration. 
-It was developed to address the familiar problem that, for a team to work together effectively, members 
-need to keep up-to-date with what everyone else is working on. Rather than handling this problem with 
-long meetings or micromanagement, Snippets takes a different approach. Every Friday evening, an email 
-is sent out to all team members asking them to reply with a bullet list summarizing what they did 
-last week and what they plan to work on in the current week. These lists, termed snippets, are 
-automatically compiled and emailed out the following day to the entire team. The snippets are also 
-saved to a database that anyone on the team can browse using a web app. The result is that any team 
-member can quickly get a general overview of what's going on, such as a project's status or what 
-others are doing, without disrupting flow.
-
-Read more about this porject at Rocket Fuel here: 
+Read more about this porject at Rocket Fuel: 
 https://docs.google.com/a/rocketfuelinc.com/document/d/1npaScAPm-Y8-w1x5ZpVmpsC-n-XchPZSk95ShOkgKaQ
 """
 
