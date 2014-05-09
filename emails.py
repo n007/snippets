@@ -65,7 +65,7 @@ class OneDigestEmail(webapp.RequestHandler):
         user = user_from_email(self.request.get('email'))
         # This can be daily or weekly retrieval
         d = date_for_daily_retrieval()
-        all_snippets = Snippet.all().filter("date =", d).fetch(500)
+        all_snippets = Snippet.all().filter("date =", d).fetch(NUM_USERS)
         all_users = User.all().fetch(NUM_USERS)
         following = compute_following(user, all_users)
         logging.info(all_snippets)

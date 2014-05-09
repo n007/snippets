@@ -27,6 +27,8 @@ from model import *
 import functools
 import urllib
 
+NUM_USERS=1000
+
 def authenticated(method):
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
@@ -126,7 +128,7 @@ class TagHandler(BaseHandler):
     def get(self, tag):
         user = self.get_user()
         d = date_for_retrieval()
-        all_snippets = Snippet.all().filter("date =", d).fetch(500)
+        all_snippets = Snippet.all().filter("date =", d).fetch(NUM_USERS)
         if (tag != 'all'):
             all_snippets = [s for s in all_snippets if tag in s.user.tags]
         following = tag in user.tags_following
@@ -162,7 +164,7 @@ class MainHandler(BaseHandler):
             user.put()
             
         # Fetch user list and display
-        raw_users = User.all().order('email').fetch(500)
+        raw_users = User.all().order('email').fetch(NUM_USERS)
         following = compute_following(user, raw_users)
         all_users = [(u, u.email in following) for u in raw_users]
         all_tags = set()
