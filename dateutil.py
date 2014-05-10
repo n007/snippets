@@ -71,12 +71,18 @@ def date_for_retrieval():
     
     
 def date_for_daily_snippet():
-    """Return today."""
+    """Return today, if weekend -- Sat(5), Sun(6) return previous friday."""
     today = datetime.datetime.now(Pacific_tzinfo()).date()
-    return today
+    snippet_day = today
+    if (today.weekday() >= 5):
+        snippet_day = today - datetime.timedelta(days=(today.weekday() - 4))
+    
+    return snippet_day
         
 def date_for_daily_retrieval():
-    """Always return yesterday."""
+    """Return yesterday, if monday (0) return previous friday."""
     today = datetime.datetime.now(Pacific_tzinfo()).date()
+    if (today.weekday() = 0):
+        return today - datetime.timedelta(days=3)
     return today - datetime.timedelta(days=1)
     
