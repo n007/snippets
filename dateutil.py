@@ -82,7 +82,7 @@ def date_for_daily_snippet():
 def date_for_daily_retrieval():
     """Return yesterday, if monday (0) return previous friday."""
     today = datetime.datetime.now(Pacific_tzinfo()).date()
-    if (today.weekday() = 0):
+    if (today.weekday() == 0):
         return today - datetime.timedelta(days=3)
     return today - datetime.timedelta(days=1)
     
