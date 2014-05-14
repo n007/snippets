@@ -38,22 +38,22 @@ class ReceiveEmail(InboundMailHandler):
             if body.encoding == '8bit':
                 body.encoding = '7bit'
             content = body.decode()
-            logging.debug("ReminderEmail content = %s ", content)
+            #logging.debug("ReminderEmail content = %s ", content)
 
             sig_pattern = re.compile(r'^\-\-\s*$', re.MULTILINE)
             split_email = re.split(sig_pattern, content)
             content = split_email[0]
-            logging.debug("ReminderEmail content = %s ", content)
+            #logging.debug("ReminderEmail content = %s ", content)
             
             reply_pattern = re.compile(r'^On.*at.*snippets', re.MULTILINE)
             split_email = re.split(reply_pattern, content)
             content = split_email[0]
-            logging.debug("ReminderEmail content = %s ", content)
+            #logging.debug("ReminderEmail content = %s ", content)
             
             reply_pattern = re.compile(r'.*' + signature + '.*', re.MULTILINE)
             split_email = re.split(reply_pattern, content)
             content = split_email[0]
-            logging.debug("ReminderEmail content = %s ", content)
+            #logging.debug("ReminderEmail content = %s ", content)
             
             create_or_replace_snippet(user, content, date)
 
