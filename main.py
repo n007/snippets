@@ -1,20 +1,7 @@
-#!/usr/bin/env python
-#
-# Copyright 2007 Google Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
 import os
+import functools
+import urllib
+import ConfigParser
 
 from google.appengine.api import users
 from google.appengine.ext import webapp
@@ -24,10 +11,11 @@ from google.appengine.ext.webapp import util
 from emails import *
 from model import *
 
-import functools
-import urllib
 
-NUM_USERS=1000
+CONFIG = ConfigParser.RawConfigParser()
+CONFIG.read('configs/snippet.cfg')
+NUM_USERS = CONFIG.getint('Global','num_users')
+
 
 def authenticated(method):
     @functools.wraps(method)
@@ -43,7 +31,7 @@ def authenticated(method):
 
 class BaseHandler(webapp.RequestHandler):
     def get_user(self):
-        '''Returns the user object on authenticated requests'''
+        #Returns the user object on authenticated requests
         user = users.get_current_user()
         assert user
 
@@ -62,7 +50,7 @@ class BaseHandler(webapp.RequestHandler):
         
 
 class UserHandler(BaseHandler):
-    """Show a given user's snippets."""
+    #Show a given user's snippets.
 
     @authenticated
     def get(self, email):
@@ -72,8 +60,7 @@ class UserHandler(BaseHandler):
         snippets = desired_user.snippet_set
         snippets = sorted(snippets, key=lambda s: s.date, reverse=True)
         following = email in user.following 
-        tags = [(t, t in user.tags_following) for t in desired_user.tags]
-         
+        tags = [(t, t in user.tags_following) for t in desired_user.tags]    
         template_values = {
                            'current_user' : user,
                            'user': desired_user,
@@ -85,14 +72,13 @@ class UserHandler(BaseHandler):
 
 
 class FollowHandler(BaseHandler):
-    """Follow a user or tag."""
+    #Follow a user or tag.
     @authenticated
     def get(self):
         user = self.get_user()
         desired_tag = self.request.get('tag')
         desired_user = self.request.get('user')
-        continue_url = self.request.get('continue')
-        
+        continue_url = self.request.get('continue')     
         if desired_tag and (desired_tag not in user.tags_following):
             user.tags_following.append(desired_tag)
             user.put()
@@ -104,14 +90,13 @@ class FollowHandler(BaseHandler):
 
 
 class UnfollowHandler(BaseHandler):
-    """Unfollow a user or tag."""
+    #Unfollow a user or tag.
     @authenticated
     def get(self):
         user = self.get_user()
         desired_tag = self.request.get('tag')
         desired_user = self.request.get('user')
-        continue_url = self.request.get('continue')
-        
+        continue_url = self.request.get('continue')      
         if desired_tag and (desired_tag in user.tags_following):
             user.tags_following.remove(desired_tag)
             user.put()
@@ -123,16 +108,15 @@ class UnfollowHandler(BaseHandler):
         
 
 class TagHandler(BaseHandler):
-    """View this week's snippets in a given tag."""
+    #View this week's snippets in a given tag.
     @authenticated
     def get(self, tag):
         user = self.get_user()
-        d = date_for_retrieval()
-        all_snippets = Snippet.all().filter("date =", d).fetch(NUM_USERS)
+        date = date_for_retrieval()
+        all_snippets = Snippet.all().filter("date =", date).fetch(NUM_USERS)
         if (tag != 'all'):
             all_snippets = [s for s in all_snippets if tag in s.user.tags]
         following = tag in user.tags_following
-
         template_values = {
                            'current_user' : user,
                            'snippets': all_snippets,
@@ -143,7 +127,7 @@ class TagHandler(BaseHandler):
 
     
 class MainHandler(BaseHandler):
-    """Show list of all users and acting user's settings."""
+    #Show list of all users and acting user's settings.
 
     @authenticated
     def get(self):
@@ -171,7 +155,7 @@ class MainHandler(BaseHandler):
         for u in raw_users:
             all_tags.update(u.tags)
         all_tags = [(t, t in user.tags_following) for t in all_tags]
-        
+        all_tags.sort()
         template_values = {
                            'current_user' : user,
                            'all_users': all_users,

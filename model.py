@@ -1,10 +1,17 @@
 import logging
+import ConfigParser
 
 from google.appengine.api import users
 from google.appengine.ext import db
 
+
+CONFIG = ConfigParser.RawConfigParser()
+CONFIG.read('configs/snippet.cfg')
+EMAIL_REPALCE_FROM = CONFIG.get('Model','email_replace_from')
+EMAIL_REPALCE_TO = CONFIG.get('Model','email_replace_to')
+
+
 class User(db.Model):
-    # Just store email address, because GAFYD seems to be buggy (omits domain in stored email or something...)
     email = db.StringProperty()
     following = db.StringListProperty()
     enabled = db.BooleanProperty(default=True)
@@ -13,35 +20,46 @@ class User(db.Model):
     
     def pretty_name(self):
         return self.email.split('@')[0]
-    
+
+
 class Snippet(db.Model):
     user = db.ReferenceProperty(User)
     text = db.TextProperty()
     date = db.DateProperty()
-    
+
+
 def compute_following(current_user, users):
-    """Return set of email addresses being followed by this user."""
+    #Return set of email addresses being followed by this user.
     email_set = set(current_user.following)
     tag_set = set(current_user.tags_following)
-    # Always self follower
+    #Always self follower
     following = set(current_user.email)
+    logging.debug("compute_following, user = %s ", current_user.email)
     for u in users:
         if ((u.email in email_set) or
             (len(tag_set.intersection(u.tags)) > 0)):
             following.add(u.email)
-    return following            
-    
+            logging.debug("compute_following, user = %s ", u.email)
+    return following 
+
+
 def user_from_email(email):
-    #handle emails from rocketfuel.com
-    email = email.replace("rocketfuel.com","rocketfuelinc.com",1);
+    #Handle emails from rocketfuel.com domain as if rocketfuelinc.com
+    email = email.replace(EMAIL_REPALCE_FROM, EMAIL_REPALCE_TO, 1);
+    logging.debug("user_from_email email = %s ", email)
     return User.all().filter("email =", email).fetch(1)[0]
-    
+
+
 def create_or_replace_snippet(user, text, date):
-    # Delete existing (yeah, yeah, should be a transaction)
+    if (text == ''):
+        logging.warning("create_or_replace_snippet, got empty snippet: %s, %s ", user, date)
+        return
+    #Delete existing snippets(yeah, yeah, should be a transaction)
+    #Handling by fetching 10 (instead 1) and deleting them
+    #TODO: add transaction support
     for existing in Snippet.all().filter("date =", date).filter("user =", user).fetch(10):
         existing.delete()
-    
     # Write new
     snippet = Snippet(text=text, user=user, date=date)
     snippet.put()
-       
+    logging.debug("create_or_replace_snippet user=%s, date=%s, text=%s  ", user, date, text)

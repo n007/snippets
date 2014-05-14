@@ -43,6 +43,8 @@ A local testing and staging environment for this project can be setup by followi
 12. Make code more parametrized than hard coded links and limits
 13. UI enhancements
 14. Upgrade to Python 2.7
+15. Accept daily snippets and summarize them for weekly delivery
+16. Consider tomorrow’s item/plan as additional input
 
 
 (E) References

@@ -1,88 +1,117 @@
+import logging
 import datetime
+import ConfigParser
 
-class Eastern_tzinfo(datetime.tzinfo):
-    """Implementation of the Eastern timezone.
-    
-    Adapted from http://code.google.com/appengine/docs/python/datastore/typesandpropertyclasses.html
-    """
-    def utcoffset(self, dt):
-        return datetime.timedelta(hours=-5) + self.dst(dt)
+from datetime import tzinfo, timedelta
 
-    def _FirstSunday(self, dt):
-        """First Sunday on or after dt."""
+
+CONFIG = ConfigParser.RawConfigParser()
+CONFIG.read('configs/snippet.cfg')
+SNIPPET_PERIOD = CONFIG.get('DateTimeUtil','snippet_period')
+
+class USTimeZone(tzinfo):
+
+    def __init__(self, hours, reprname, stdname, dstname):
+        self.stdoffset = timedelta(hours=hours)
+        self.reprname = reprname
+        self.stdname = stdname
+        self.dstname = dstname
+
+    def __repr__(self):
+        return self.reprname
+        
+    def __firstsunday(self, dt):
+        #First Sunday on or after dt.
         return dt + datetime.timedelta(days=(6-dt.weekday()))
 
-    def dst(self, dt):
-        # 2 am on the second Sunday in March
-        dst_start = self._FirstSunday(datetime.datetime(dt.year, 3, 8, 2))
-        # 1 am on the first Sunday in November
-        dst_end = self._FirstSunday(datetime.datetime(dt.year, 11, 1, 1))
+    def utcoffset(self, dt):
+        return self.stdoffset + self.dst(dt)
+        
+    def tzname(self, dt):
+        if self.dst(dt):
+            return self.dstname
+        else:
+            return self.stdname
 
+    def dst(self, dt):
+        if dt is None or dt.tzinfo is None:
+            return ZERO
+        assert dt.tzinfo is self
+
+        # US DST Rules
+        #
+        # This is a simplified (i.e., wrong for a few cases) set of rules for US
+        # DST start and end times. For a complete and up-to-date set of DST rules
+        # and timezone definitions, visit the Olson Database (or try pytz):
+        # http://www.twinsun.com/tz/tz-link.htm
+        #
+        # In the US, since 2007, DST starts at 2am (standard time) on the second
+        # Sunday in March, which is the first Sunday on or after Mar 8.
+        dst_start = self.__firstsunday(datetime.datetime(dt.year, 3, 8, 2))
+        # 1 am on the first Sunday in November
+        dst_end = self.__firstsunday(datetime.datetime(dt.year, 11, 1, 1))
+        
         if dst_start <= dt.replace(tzinfo=None) < dst_end:
             return datetime.timedelta(hours=1)
         else:
             return datetime.timedelta(hours=0)
-        
-    def tzname(self, dt):
-        if self.dst(dt) == datetime.timedelta(hours=0):
-            return "EST"
-        else:
-            return "EDT"
-        
-class Pacific_tzinfo(datetime.tzinfo):
-    """Implementation of the Pacific timezone.
+
+#Set Snippet Timezone
+SNIPPET_TZ = USTimeZone(-8, "Pacific",  "PST", "PDT")
+
+
+def date_for_snippet():
+    if(SNIPPET_PERIOD == "daily"):
+        return date_for_daily_snippet()
+    else:
+        return date_for_weekly_snippet()     
+
     
-    Adapted from http://code.google.com/appengine/docs/python/datastore/typesandpropertyclasses.html
-    """
-    def utcoffset(self, dt):
-        return datetime.timedelta(hours=-8) + self.dst(dt)
-
-    def _FirstSunday(self, dt):
-        """First Sunday on or after dt."""
-        return dt + datetime.timedelta(days=(6-dt.weekday()))
-
-    def dst(self, dt):
-        # 2 am on the second Sunday in March
-        dst_start = self._FirstSunday(datetime.datetime(dt.year, 3, 8, 2))
-        # 1 am on the first Sunday in November
-        dst_end = self._FirstSunday(datetime.datetime(dt.year, 11, 1, 1))
-
-        if dst_start <= dt.replace(tzinfo=None) < dst_end:
-            return datetime.timedelta(hours=1)
-        else:
-            return datetime.timedelta(hours=0)
-        
-    def tzname(self, dt):
-        if self.dst(dt) == datetime.timedelta(hours=0):
-            return "PST"
-        else:
-            return "PDT"
-        
-def date_for_new_snippet():
-    """Return previous Monday"""
-    today = datetime.datetime.now(Pacific_tzinfo()).date()
-    aligned = today - datetime.timedelta(days=today.weekday())
-    return aligned
-
 def date_for_retrieval():
-    """Always return the most recent Monday."""
-    today = datetime.datetime.now(Pacific_tzinfo()).date()
-    return today - datetime.timedelta(days=today.weekday())
-    
-    
-def date_for_daily_snippet():
-    """Return today, if weekend -- Sat(5), Sun(6) return previous friday."""
-    today = datetime.datetime.now(Pacific_tzinfo()).date()
-    snippet_day = today
-    if (today.weekday() >= 5):
-        snippet_day = today - datetime.timedelta(days=(today.weekday() - 4))
-    
+    if(SNIPPET_PERIOD == "daily"):
+        return date_for_daily_retrieval()
+    else:
+        return date_for_weekly_retrieval()
+     
+def date_for_weekly_snippet():
+    #Return the most recent Monday
+    #If its Mon(0) or Tue(1) retrun previous Monday
+    today = datetime.datetime.now(SNIPPET_TZ).date()
+    intday = today.weekday()
+    if (intday <= 1):
+        intday += 7
+    snippet_day = today - datetime.timedelta(days=intday)
+    logging.info("date_for_weekly_snippet = %s", snippet_day)
     return snippet_day
-        
-def date_for_daily_retrieval():
-    """Return yesterday, if monday (0) return previous friday."""
-    today = datetime.datetime.now(Pacific_tzinfo()).date()
-    if (today.weekday() == 0):
-        return today - datetime.timedelta(days=3)
-    return today - datetime.timedelta(days=1)
+
+
+def date_for_weekly_retrieval():
+    #Return the most recent Monday
+    #If its Mon(0) or Tue(1) retrun previous Monday
+    return date_for_weekly_snippet()
+
+
+def date_for_daily_snippet():
+    #Return today, if weekend -- Sat(5), Sun(6) return previous Friday
+    today = datetime.datetime.now(SNIPPET_TZ).date()
+    intday = today.weekday()
+    snippet_day = today
+    if (intday >= 5):
+        snippet_day = today - datetime.timedelta(days=intday - 4)
+    logging.info("date_for_daily_snippet = %s", snippet_day)
+    return snippet_day
     
+
+def date_for_daily_retrieval():
+    #Return yesterday, if Sun(6), Mon (0) return previous Friday
+    today = datetime.datetime.now(SNIPPET_TZ).date()
+    intday = today.weekday()
+    offset = 1
+    if (intday == 0):
+        offset = 3
+    elif(intday == 6):
+        offset = 2
+    snippet_day = today - datetime.timedelta(days=offset)
+    logging.info("date_for_daily_retrieval = %s", snippet_day)
+    return snippet_day
+ 

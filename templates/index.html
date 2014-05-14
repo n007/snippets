@@ -4,23 +4,33 @@
 
 <h2><a href="/user/{{ current_user.email }}" style="text-decoration:none;">welcome {{ current_user.pretty_name }}</a></h2>
 
-<ul><li type=circle>manage your profile 
+<ul>
+	<li type=circle>learn more about backend of this project from 
+		<a class="light" href="https://docs.google.com/a/rocketfuelinc.com/document/d/1npaScAPm-Y8-w1x5ZpVmpsC-n-XchPZSk95ShOkgKaQ">
+			spec document</a></li><br/>
+	<li type=circle>manage your profile 
 	 <a class="light" href="/user/{{ current_user.email }}" style="font-size: 75%">
 			( logged in as: {{ current_user.email }} )</a></li></ul>
 <table>
 	<tr>
     <td><div style="width: 35px"></div></td>
-	<td style="font-size: 75%">
+	<td style="font-size: 85%">
     {% if current_user.enabled %}
-       ✓ currently snippets are enabled  (<a class="light" href="?setenabled=0"> disable it </a>)
+       ✓ snippet stauts -- enabled &nbsp;[<a class="light" href="?setenabled=0"> disable it </a>]
     {% else %}
-       ✓ currently snippets are disabled (<a class="light" href="?setenabled=1"> enable it </a>)
+       ✓ snippet stauts -- disabled &nbsp;[<a class="light" href="?setenabled=1"> enable it </a>]
     {% endif %}
 
-    <form action="/" method="get">    
-    <br>✓ my groups 
+    <br>
+    <form action="/" method="get">
+	  {% if current_user.tags %}
+	    ✓ group status ---- {{ current_user.tags.0 }} 
+	  {% else %}
+		✓ group status ---- none
+	  {% endif %}
+	  &nbsp;[     
 	  <select name="tags">;
-		<option value="#">select your group</option>
+		<option value="none">select/change your group</option>
 	    <option value="hbase">hbase</option>
 		<option value="hive">hive</option>
 		<option value="modeling infrastructure">modeling infrastructure</option>
@@ -30,25 +40,25 @@
 		<option value="modeling">modeling</option>
 		<option value="optimization">optimization</option>
 		<option value="apps">apps</option>
-		<option value="ground control">ground_Control</option>
+		<option value="ground control">ground control</option>
 		<option value="engineering">engineering</option>
 		<input type="submit" value="submit" onclick="{{ current_user.tags|join:"," }}">									
 	  </select>	
+	  ]
 	</form>
     </td></tr>
 </table>
 
 	<ul>
-    <li type=circle>send your snippets by monday morning to <a class="light" href="mailto:snippets@noted-tesla-574.appspotmail.com?Subject=Snippet%20time" target="_top">
-		this snippet alias</a></li><br/>
-	<li type=circle>learn more about backend of this project from 
-		<a class="light" href="https://docs.google.com/a/rocketfuelinc.com/document/d/1npaScAPm-Y8-w1x5ZpVmpsC-n-XchPZSk95ShOkgKaQ">this document</a></li>
+    <li type=circle>reply to friday evening's snippet reminder email OR send your snippets by monday morning to <a class="light" href="mailto:snippets@noted-tesla-574.appspotmail.com?Subject=Snippet%20time" target="_top">
+		snippet alias</a></li><br/>
+    <li type=circle>follow from following directory, users and/or groups of interest to receive a weekly digest on monday afternoon </li>	
     </ul>
 	   
     <table cellspacing=20>
       <tr>
         <td valign="top">
-			    <h3>Users</h3>
+			    <h3>all snippet users</h3>
 			    {% for user in all_users %}
 			      <a href="/user/{{ user.0.email }}">{{ user.0.pretty_name }}</a>&nbsp;
 			      {% if user.1 %}
@@ -60,7 +70,7 @@
 			    {% endfor %}
 		     </td>
 				 <td valign="top">        
-  			   <h3>Groups</h3>
+  			   <h3>all snippet groups</h3>
 	 		     {% for tag in all_tags %}
 			       <a href="/tag/{{ tag.0 }}">{{ tag.0 }}</a>&nbsp;
 			       {% if tag.1 %}

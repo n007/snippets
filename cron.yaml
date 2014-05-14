@@ -1,9 +1,13 @@
 cron:
 - description: weekly reminder
   url: /reminderemail
-  schedule: every mon,tue,wed,thu,fri 17:00
+  schedule: every tue 22:50
   timezone: America/Los_Angeles
+- description: final weekly reminder
+  url: /reminderemail
+  schedule: every mon 10:00
+  timezone: America/Los_Angeles  
 - description: weekly digest
   url: /digestemail
-  schedule: every mon,tue,wed,thu,fri 10:00
+  schedule: every 600 mins
   timezone: America/Los_Angeles
