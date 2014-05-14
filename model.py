@@ -34,12 +34,12 @@ def compute_following(current_user, users):
     tag_set = set(current_user.tags_following)
     #Always self follower
     following = set(current_user.email)
-    logging.debug("compute_following, user = %s ", current_user.email)
+    #logging.debug("compute_following, user = %s ", current_user.email)
     for u in users:
         if ((u.email in email_set) or
             (len(tag_set.intersection(u.tags)) > 0)):
             following.add(u.email)
-            logging.debug("compute_following, user = %s ", u.email)
+            #logging.debug("compute_following, user = %s ", u.email)
     return following 
 
 
