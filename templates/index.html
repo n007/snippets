@@ -22,6 +22,13 @@
     {% endif %}
 
     <br>
+    {% if current_user.weekly %}
+       ✓ snippet freq. ---- weekly &nbsp;[<a class="light" href="?setweekly=0"> make it daily </a>]
+    {% else %}
+       ✓ snippet freq. ---- daily &nbsp;[<a class="light" href="?setweekly=1"> make it weekly </a>]
+    {% endif %}
+
+    <br>
     <form action="/" method="get">
 	  {% if current_user.tags %}
 	    ✓ group status ---- {{ current_user.tags.0 }} 

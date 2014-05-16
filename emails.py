@@ -27,7 +27,7 @@ class ReminderEmail(webapp.RequestHandler):
         date = date_for_snippet()
         all_users = User.all().filter("enabled =", True).fetch(NUM_USERS)
         for user in all_users:
-            #If no snippet for this user this date, send a reminder
+            #If no snippet for this user, this date, send a reminder
             try:
                 snippet = Snippet.all().filter("date =", date).filter("user =", user).fetch(1)[0].text
                 logging.debug("ReminderEmail snippets = %s ", snippet)
@@ -61,9 +61,9 @@ class OneDigestEmail(webapp.RequestHandler):
                        subject=DIGEST_SUBJECT,
                        body=body)
 
-    def __snippet_to_text(self, snippet):
+    def __snippet_to_text(self, snippet, date):
         divider = '-' * 30
-        snippet = '%s\n%s\n%s' % (snippet.user.pretty_name(), divider, snippet.text)
+        snippet = '%s,  %s\n%s\n%s' % (snippet.user.pretty_name(), date, divider, snippet.text)
         logging.debug("OneDigestEmail __snippet_to_text snippets = %s ", snippet)
         return snippet
         
@@ -78,7 +78,7 @@ class OneDigestEmail(webapp.RequestHandler):
         all_snippets = Snippet.all().filter("date =", date).fetch(NUM_USERS)
         all_users = User.all().fetch(NUM_USERS)
         following = compute_following(user, all_users)
-        body = '\n\n'.join([self.__snippet_to_text(s) for s in all_snippets if s.user.email in following])
+        body = '\n\n'.join([self.__snippet_to_text(s, date) for s in all_snippets if s.user.email in following])
         if body:
             self.__send_mail(user.email, PROJECT_URL + '\n\n' + body)
         else:

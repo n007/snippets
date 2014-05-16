@@ -141,6 +141,15 @@ class MainHandler(BaseHandler):
             user.enabled = False
             user.put()
 
+        # Update weekly state if requested
+        set_weekly = self.request.get('setweekly')
+        if set_weekly == '1':
+            user.weekly = True
+            user.put()
+        elif set_weekly == '0':
+            user.weekly = False
+            user.put()
+            
         # Update tags if sent
         tags = self.request.get('tags')
         if tags:
