@@ -27,6 +27,19 @@ class Snippet(db.Model):
     user = db.ReferenceProperty(User)
     text = db.TextProperty()
     date = db.DateProperty()
+    weekly = db.BooleanProperty(default=False)
+  
+    def title(self):
+      return self.user_title() + ' ' + self.date_title()
+
+    def user_title(self):
+      return self.user.pretty_name() + '\'s snippet'
+
+    def date_title(self):
+      if(self.weekly):
+        return 'for week of ' + self.date
+      else:
+        return 'for ' + self.date         
 
 
 def compute_following(current_user, users):
@@ -51,16 +64,17 @@ def user_from_email(email):
     return User.all().filter("email =", email).fetch(1)[0]
 
 
-def create_or_replace_snippet(user, text, date):
+def create_or_replace_snippet(user, text, date, weekly):
     if (text == ''):
         logging.warning("create_or_replace_snippet, got empty snippet: %s, %s ", user, date)
         return
     #Delete existing snippets(yeah, yeah, should be a transaction)
-    #Handling by fetching 10 (instead 1) and deleting them
+    #Handling by fetching few (instead 1) and deleting them
     #TODO: add transaction support
-    for existing in Snippet.all().filter("date =", date).filter("user =", user).fetch(10):
+    TRANS_SALT=10
+    for existing in Snippet.all().filter("date =", date).filter("user =", user).fetch(TRAN_SALT):
         existing.delete()
     # Write new
-    snippet = Snippet(text=text, user=user, date=date)
+    snippet = Snippet(text=text, user=user, date=date, weekly=weekly)
     snippet.put()
-    logging.debug("create_or_replace_snippet user=%s, date=%s, text=%s  ", user, date, text)
+    logging.debug("create_or_replace_snippet user=%s, date=%s, weekly=%s, text=%s  ", user, date, weekly, text)

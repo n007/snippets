@@ -29,22 +29,34 @@ A local testing and staging environment for this project can be setup by followi
 
 
 (D) Feature/Task Roadmap
-1. Make my app specific changes
-2. Change cron timings to daily and then to Friday/Monday
-3. Move to PST
-4. Send self sufficient text in reminder email
-5. Send digest for self subscription
-6. Handle rocketfuelinc/rocketfuel email address seamlessly
-7. Remind again if not replied, skip if already replied
-8. Add Rocket Fuel Domain
-9. Auto remove text other than bulleted list of items
-10. Allow to put Monday date in the subject line to override and backfill
-11. Avoid someone overriding with empty list
-12. Make code more parametrized than hard coded links and limits
-13. UI enhancements
-14. Upgrade to Python 2.7
-15. Accept daily snippets and summarize them for weekly delivery
-16. Consider tomorrow’s item/plan as additional input
+v1
+- Basic Drop
+v2
+- Make my app specific changes
+- Change cron timings to daily for now
+- Move to PST
+- Send self sufficient text in reminder email
+- Send digest for self subscription
+- Handle rocketfuelinc/rocketfuel email address seamlessly
+- Few basic UI enhancements
+v3
+- Auto remove text other than bulleted list of items
+- Remind again if not replied, skip if already replied
+- Groups digest is not working, fix it
+- Changing groups sometimes does not reflect on web app and needs a refresh
+- Avoid user overriding with empty list or support versioning
+- Allow to put a date in the subject line or in the body to override and backfill
+- Make code more parametrized/portable, lots of  hard coded links and limits
+v4
+- User level configuration for daily/weekly snippets
+- Visibility around snippet date on UI
+- Visibility around snippet date in reminder and digest emails
+- FAQ page to website
+v5+
+- Add Rocket Fuel Domain
+- Upgrade to Python 2.7
+- Add unit tests
+
 
 
 (E) References

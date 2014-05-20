@@ -60,6 +60,16 @@ class USTimeZone(tzinfo):
 SNIPPET_TZ = USTimeZone(-8, "Pacific",  "PST", "PDT")
 
 
+def isweekday(date):
+    intday = date.weekday()
+    return True if intday < 5 else False
+
+
+def isweeklysnippetday(date):
+    intday = date.weekday()
+    return True if intday == 0 else False
+
+
 def time_for_reminder(weeklysnippet):
     #If weekly don't remind on Wed(2) Thu(3)
     today = datetime.datetime.now(SNIPPET_TZ).date()

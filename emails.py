@@ -15,7 +15,6 @@ CONFIG.read('configs/snippet.cfg')
 NUM_USERS = CONFIG.getint('Global','num_users')
 COMPANY_NAME = CONFIG.get('Global','company_name')
 PROJECT_URL = CONFIG.get('Global','project_url')
-REMINDER_SUBJECT = CONFIG.get('Emails','reminder_subject')
 DIGEST_SUBJECT = CONFIG.get('Emails','digest_subject')
 EMAIL_SENDER = CONFIG.get('Emails','email_sender')
 REMINDER_BODY = "Hey " + COMPANY_NAME + " Nerd,\n\n" + \
@@ -39,14 +38,17 @@ class ReminderEmail(webapp.RequestHandler):
                 logging.debug("ReminderEmail snippets = %s ", snippet)
             except IndexError:
                 logging.debug("ReminderEmail sending reminder to = %s ", user.email)
-                taskqueue.add(url='/onereminder', params={'email': user.email})
+                subject = '[REMINDER] snippet time for '
+                subject += 'week of ' if wkly else ''
+                subject += date
+                taskqueue.add(url='/onereminder', params={'email': user.email, 'sub': subject})
 
 
 class OneReminderEmail(webapp.RequestHandler):
     def post(self):
         mail.send_mail(sender=EMAIL_SENDER,
                        to=self.request.get('email'),
-                       subject=REMINDER_SUBJECT,
+                       subject=self.request.get('sub'),
                        body=REMINDER_BODY)
 
     def get(self):
@@ -67,11 +69,12 @@ class OneDigestEmail(webapp.RequestHandler):
                        subject=DIGEST_SUBJECT,
                        body=body)
 
-    def __snippet_to_text(self, snippet, date, decortext):
+    def __snippet_to_text(self, snippet):
         divider = '-' * 30
-        snippet = '%s\'s snippet for %s %s\n%s\n%s' % (snippet.user.pretty_name(), decortext, date, divider, snippet.text)
-        logging.debug("OneDigestEmail __snippet_to_text snippets = %s ", snippet)
-        return snippet
+        retval = snippet.title() 
+        retval += '\n%s\n%s' % (divider, snippet.text)
+        logging.debug("OneDigestEmail __snippet_to_text snippets = %s ", retval)
+        return retval
         
 
     def get(self):
@@ -95,8 +98,7 @@ class OneDigestEmail(webapp.RequestHandler):
                 w = s.user.weekly
                 logging.debug("OneDigestEmail s.user.email=%s s.user.weekly=%s", e, w)
                 if (e in following and w == wkly):
-                    decortext = 'week of' if w else ''
-                    body += '\n\n' + self.__snippet_to_text(s, date, decortext)
+                    body += '\n\n' + self.__snippet_to_text(s)
         if body:
             self.__send_mail(user.email, PROJECT_URL + '\n\n' + body)
         else:
