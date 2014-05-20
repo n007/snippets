@@ -77,6 +77,7 @@ class OneDigestEmail(webapp.RequestHandler):
     def get(self):
         post(self)
 
+
     def post(self):
         user = user_from_email(self.request.get('email'))
         date = date_for_retrieval()
