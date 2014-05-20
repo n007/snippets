@@ -23,7 +23,7 @@ class ReceiveEmail(InboundMailHandler):
         user = user_from_email(email.utils.parseaddr(message.sender)[1])
         signature = email.utils.parseaddr(message.sender)[0]
         subject = message.subject
-        date = date_for_daily_snippet(user.weekly)
+        date = date_for_snippet(user.weekly)
         logging.debug("ReminderEmail sender = %s, signature = %s ", message.sender, signature)
         logging.debug("ReminderEmail subject = %s, date = %s", subject, date)
         match=re.search(r'(\d+-\d+-\d+)', subject)
