@@ -113,11 +113,12 @@ class TagHandler(BaseHandler):
     def get(self, tag):
         user = self.get_user()
         following = tag in user.tags_following
+        all_snippets = []
         for wkly in (True, False):
             date = date_for_retrieval(wkly)
             dated_snippets = Snippet.all().filter("date =", date).fetch(NUM_USERS)
             for s in dated_snippets:
-                if tag in s.user.tags:
+                if (tag in s.user.tags and s.user.weekly == wkly):
                     all_snippets.append(s)
         template_values = {
                            'current_user' : user,

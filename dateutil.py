@@ -110,7 +110,7 @@ def time_for_digest(weekly):
     if (weekly and intday == 0):
         return True
     #If daily, Weekday digest
-    elif (not weekly and intday < 5)
+    elif ((not weekly) and intday < 5):
         return True
     #No digest
     else:    

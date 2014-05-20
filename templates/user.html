@@ -26,14 +26,13 @@
   
   <div style="float: left; margin-left: 30px; max-width: 600px">
     {% for snippet in snippets %}
-	  <b>For</b>&nbsp;
+	  <b>for</b>
 	  {% if user.weekly %}
-	    <b>Week of</b>&nbsp;
+	    <b>week of</b>
 	  {% endif %}
       <b>{{ snippet.date }}</b><br/>
       <pre>{{ snippet.text|urlize }}</pre>
-      <br/></br>
     {% endfor %}
-   </div>
+  </div>
 
 {% endblock %}
