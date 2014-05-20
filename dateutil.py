@@ -60,7 +60,22 @@ class USTimeZone(tzinfo):
 SNIPPET_TZ = USTimeZone(-8, "Pacific",  "PST", "PDT")
 
 
-def date_for_snippet():
+def time_for_reminder(weeklysnippet):
+    today = datetime.datetime.now(SNIPPET_TZ).date()
+    intday = today.weekday()
+    if (weeklysnippet and intday > 1 and intday < 4):
+        return False
+    return True    
+
+
+def date_for_snippet(weeklysnippet):
+    if(weeklysnippet):
+        return date_for_weekly_snippet()
+    else:
+        return date_for_daily_snippet()
+
+
+def date_for_globalconf_snippet():
     if(SNIPPET_PERIOD == "daily"):
         return date_for_daily_snippet()
     else:

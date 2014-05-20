@@ -24,10 +24,16 @@ REMINDER_BODY = "Hey " + COMPANY_NAME + " Nerd,\n\n" + \
 
 class ReminderEmail(webapp.RequestHandler):
     def get(self):
-        date = date_for_snippet()
         all_users = User.all().filter("enabled =", True).fetch(NUM_USERS)
         for user in all_users:
-            #If no snippet for this user, this date, send a reminder
+            #skip if weekly user and its not time for reminder, else set snippet date
+            wkly = user.weekly;
+            logging.debug("ReminderEmail weekly = %s ", wkly)
+            if (time_for_reminder(wkly)):
+                date = date_for_snippet(wkly)
+            else:
+                continue
+            #check if snippet already exists for this date, if so don't remind
             try:
                 snippet = Snippet.all().filter("date =", date).filter("user =", user).fetch(1)[0].text
                 logging.debug("ReminderEmail snippets = %s ", snippet)

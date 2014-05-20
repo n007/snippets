@@ -17,7 +17,7 @@ class User(db.Model):
     enabled = db.BooleanProperty(default=True)
     tags = db.StringListProperty()
     tags_following = db.StringListProperty()
-    weekly = db.BooleanProperty(default=True)
+    weekly = db.BooleanProperty(default=False)
     
     def pretty_name(self):
         return self.email.split('@')[0]
