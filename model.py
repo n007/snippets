@@ -28,7 +28,7 @@ class Snippet(db.Model):
     text = db.TextProperty()
     date = db.DateProperty()
     weekly = db.BooleanProperty(default=False)
-  
+
     def title(self):
       return self.user_title() + ' ' + self.date_title()
 
@@ -37,9 +37,9 @@ class Snippet(db.Model):
 
     def date_title(self):
       if(self.weekly):
-        return 'for week of ' + self.date
+        return 'for week of ' + str(self.date)
       else:
-        return 'for ' + self.date         
+        return 'for ' + str(self.date)
 
 
 def compute_following(current_user, users):
