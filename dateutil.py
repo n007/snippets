@@ -61,6 +61,7 @@ SNIPPET_TZ = USTimeZone(-8, "Pacific",  "PST", "PDT")
 
 
 def time_for_reminder(weeklysnippet):
+    #If weekly don't remind on Wed(2) Thu(3)
     today = datetime.datetime.now(SNIPPET_TZ).date()
     intday = today.weekday()
     if (weeklysnippet and intday > 1 and intday < 4):
@@ -76,18 +77,9 @@ def date_for_snippet(weeklysnippet):
 
 
 def date_for_globalconf_snippet():
-    if(SNIPPET_PERIOD == "daily"):
-        return date_for_daily_snippet()
-    else:
-        return date_for_weekly_snippet()     
+    return date_for_snippet(not SNIPPET_PERIOD == "daily")
 
-    
-def date_for_retrieval():
-    if(SNIPPET_PERIOD == "daily"):
-        return date_for_daily_retrieval()
-    else:
-        return date_for_weekly_retrieval()
-     
+
 def date_for_weekly_snippet():
     #Return the most recent Monday
     #If its Mon(0) or Tue(1) retrun previous Monday
@@ -100,12 +92,6 @@ def date_for_weekly_snippet():
     return snippet_day
 
 
-def date_for_weekly_retrieval():
-    #Return the most recent Monday
-    #If its Mon(0) or Tue(1) retrun previous Monday
-    return date_for_weekly_snippet()
-
-
 def date_for_daily_snippet():
     #Return today, if weekend -- Sat(5), Sun(6) return previous Friday
     today = datetime.datetime.now(SNIPPET_TZ).date()
@@ -115,7 +101,38 @@ def date_for_daily_snippet():
         snippet_day = today - datetime.timedelta(days=intday - 4)
     logging.info("date_for_daily_snippet = %s", snippet_day)
     return snippet_day
-    
+
+
+def time_for_digest(weekly):
+    today = datetime.datetime.now(SNIPPET_TZ).date()
+    intday = today.weekday()
+    #If weekly, Monday digest
+    if (weekly and intday == 0):
+        return True
+    #If daily, Weekday digest
+    elif (not weekly and intday < 5)
+        return True
+    #No digest
+    else:    
+        return False   
+
+
+def date_for_retrieval(weeklysnippet):
+    if(weeklysnippet):
+        return date_for_weekly_retrieval()
+    else:
+        return date_for_daily_retrieval()
+
+
+def date_for_globalconf_retrieval():
+    return date_for_retrieval(not SNIPPET_PERIOD == "daily")
+
+
+def date_for_weekly_retrieval():
+    #Return the most recent Monday
+    #If its Mon(0) or Tue(1) retrun previous Monday
+    return date_for_weekly_snippet()
+
 
 def date_for_daily_retrieval():
     #Return yesterday, if Sun(6), Mon (0) return previous Friday

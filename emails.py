@@ -67,9 +67,9 @@ class OneDigestEmail(webapp.RequestHandler):
                        subject=DIGEST_SUBJECT,
                        body=body)
 
-    def __snippet_to_text(self, snippet, date):
+    def __snippet_to_text(self, snippet, date, decortext):
         divider = '-' * 30
-        snippet = '%s,  %s\n%s\n%s' % (snippet.user.pretty_name(), date, divider, snippet.text)
+        snippet = '%s\'s snippet for %s %s\n%s\n%s' % (snippet.user.pretty_name(), decortext, date, divider, snippet.text)
         logging.debug("OneDigestEmail __snippet_to_text snippets = %s ", snippet)
         return snippet
         
@@ -80,12 +80,23 @@ class OneDigestEmail(webapp.RequestHandler):
 
     def post(self):
         user = user_from_email(self.request.get('email'))
-        date = date_for_retrieval()
-        logging.debug("OneDigestEmail post user = %s date = %s ", user, date)
-        all_snippets = Snippet.all().filter("date =", date).fetch(NUM_USERS)
         all_users = User.all().fetch(NUM_USERS)
         following = compute_following(user, all_users)
-        body = '\n\n'.join([self.__snippet_to_text(s, date) for s in all_snippets if s.user.email in following])
+        #Deal with weekly and daily snippets
+        for wkly in (True, False):
+            if (time_for_digest(wkly)):
+                date = date_for_retrieval(wkly)
+            else:
+                continue    
+            logging.debug("OneDigestEmail wkly = %s user = %s date = %s", wkly, user, date)
+            all_snippets = Snippet.all().filter("date =", date).fetch(NUM_USERS)
+            for s in all_snippets:
+                e = s.user.email
+                w = s.user.weekly
+                logging.debug("OneDigestEmail s.user.email=%s s.user.weekly=%s", e, w)
+                if (e in following and w == wkly):
+                    decortext = 'week of' if w else ''
+                    body += '\n\n' + self.__snippet_to_text(s, date, decortext)
         if body:
             self.__send_mail(user.email, PROJECT_URL + '\n\n' + body)
         else:
