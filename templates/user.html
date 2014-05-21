@@ -11,6 +11,12 @@
       <a class="light" href="/follow?user={{ user.email }}&continue=/user/{{ user.email }}">follow</a>
     {% endif %}
 	<br>
+	{% if user.enabled %}
+	  <font color=#2398C9 size=2>status enabled</font>
+	{% else %}
+	  <font color=#2398C9 size=2>status disabled</font>
+	{% endif %}	
+	<br>
 	{% if user.weekly %}
 	  <font color=#2398C9 size=2>on weekly snippets</font>
 	{% else %}
