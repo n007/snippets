@@ -44,10 +44,12 @@ class Snippet(db.Model):
 
 def compute_following(current_user, users):
     #Return set of email addresses being followed by this user.
+    following = set()
     email_set = set(current_user.following)
     tag_set = set(current_user.tags_following)
-    #Always self follower
-    following = set(current_user.email)
+    #Always self and self group follower
+    email_set.add(current_user.email)
+    tag_set.add(current_user.tags)
     #logging.debug("compute_following, user = %s ", current_user.email)
     for u in users:
         if ((u.email in email_set) or
