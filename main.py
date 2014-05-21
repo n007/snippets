@@ -176,6 +176,17 @@ class MainHandler(BaseHandler):
         self.render('index', template_values)
 
 
+class FAQHandler(BaseHandler):
+    #View this week's snippets in a given tag.
+    @authenticated
+    def get(self, email):
+        user = self.get_user()
+        template_values = {
+                           'current_user' : user,
+                          }
+        self.render('faq', template_values)
+
+
 def main():
     application = webapp.WSGIApplication(
                                          [('/', MainHandler),
@@ -186,7 +197,8 @@ def main():
                                           ('/reminderemail', ReminderEmail),
                                           ('/digestemail', DigestEmail),
                                           ('/onereminder', OneReminderEmail),
-                                          ('/onedigest', OneDigestEmail)],
+                                          ('/onedigest', OneDigestEmail),
+                                          ('/faq/(.*)', FAQHandler)],
                                           debug=True)
     util.run_wsgi_app(application)
 

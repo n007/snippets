@@ -2,33 +2,31 @@
 
 {% block body %}
 
-<h2><a href="/user/{{ current_user.email }}" style="text-decoration:none;">welcome {{ current_user.pretty_name }}</a></h2>
+<h2><a class="simple" style="color: black" href="/user/{{ current_user.email }}">welcome {{ current_user.pretty_name }}</a></h2>
 
-<ul>
-	<li type=circle>learn more about backend of this project from 
-		<a class="light" href="https://docs.google.com/a/rocketfuelinc.com/document/d/1npaScAPm-Y8-w1x5ZpVmpsC-n-XchPZSk95ShOkgKaQ">
-			spec document</a></li><br/>
-	<li type=circle>manage your profile 
+<ul class="simple">
+	<li>manage your profile 
 	 <a class="light" href="/user/{{ current_user.email }}" style="font-size: 75%">
-			( logged in as: {{ current_user.email }} )</a></li></ul>
+			( logged in as: {{ current_user.email }} )</a></li>
+</ul>
 <table>
 	<tr>
     <td><div style="width: 35px"></div></td>
-	<td style="font-size: 85%">
+	<td style="font-size: 90%">
     {% if current_user.enabled %}
        ✓ snippet stauts -- enabled &nbsp;[<a class="light" href="?setenabled=0"> disable it </a>]
     {% else %}
        ✓ snippet stauts -- disabled &nbsp;[<a class="light" href="?setenabled=1"> enable it </a>]
     {% endif %}
 
-    <br>
+    <br><br>
     {% if current_user.weekly %}
        ✓ snippet freq. ---- weekly &nbsp;[<a class="light" href="?setweekly=0"> make it daily </a>]
     {% else %}
        ✓ snippet freq. ---- daily &nbsp;[<a class="light" href="?setweekly=1"> make it weekly </a>]
     {% endif %}
 
-    <br>
+    <br><br>
     <form action="/" method="get">
 	  {% if current_user.tags %}
 	    ✓ group status ---- {{ current_user.tags.0 }} 
@@ -55,19 +53,18 @@
 	</form>
     </td></tr>
 </table>
-
-	<ul>
-    <li type=circle>reply to any snippet reminder email OR send your snippets to <a class="light" href="mailto:snippets@noted-tesla-574.appspotmail.com?Subject=Snippet%20time" target="_top">
-		snippet alias</a></li><br/>
-    <li type=circle>follow from following directory, users and/or groups of interest to receive a digest</li>	
-    </ul>
-	   
-    <table cellspacing=20>
-      <tr>
-        <td valign="top">
+<br>
+<ul class="simple"><li>
+	<a class="simple" href="/faq/{{ current_user.email }}">
+	  learn more about snippets, how this works, and FAQs
+    </a>
+</li></ul>
+<table cellspacing=20>
+	<tr>
+      	<td valign="top">
 			    <h3>all snippet users</h3>
 			    {% for user in all_users %}
-			      <a href="/user/{{ user.0.email }}">{{ user.0.pretty_name }}</a>&nbsp;
+			      <a class="simple" href="/user/{{ user.0.email }}">{{ user.0.pretty_name }}</a>&nbsp;
 			      {% if user.1 %}
 			        ✓ <a class="light" href="/unfollow?user={{ user.0.email }}&continue=/">unfollow</a>
 			      {% else %}
@@ -79,7 +76,7 @@
 				 <td valign="top">        
   			   <h3>all snippet groups</h3>
 	 		     {% for tag in all_tags %}
-			       <a href="/tag/{{ tag.0 }}">{{ tag.0 }}</a>&nbsp;
+			       <a class="simple" href="/tag/{{ tag.0 }}">{{ tag.0 }}</a>&nbsp;
 			       {% if tag.1 %}
 			         ✓ <a class="light" href="/unfollow?tag={{ tag.0 }}&continue=/">unfollow</a>
 			       {% else %}
@@ -88,8 +85,7 @@
 		        <br/>
 		      {% endfor %}      
 	    </td>
-	  </tr>
-	</table>
-
+	</tr>
+</table>
 
 {% endblock %}
