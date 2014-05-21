@@ -49,7 +49,7 @@ def compute_following(current_user, users):
     tag_set = set(current_user.tags_following)
     #Always self and self group follower
     email_set.add(current_user.email)
-    tag_set.add(current_user.tags)
+    tag_set.add(current_user.tags[-1])
     #logging.debug("compute_following, user = %s ", current_user.email)
     for u in users:
         if ((u.email in email_set) or

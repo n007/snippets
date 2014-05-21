@@ -40,7 +40,7 @@ class ReminderEmail(webapp.RequestHandler):
                 logging.debug("ReminderEmail sending reminder to = %s ", user.email)
                 subject = '[REMINDER] snippet time for '
                 subject += 'week of ' if wkly else ''
-                subject += date
+                subject += str(date)
                 taskqueue.add(url='/onereminder', params={'email': user.email, 'sub': subject})
 
 
@@ -70,10 +70,9 @@ class OneDigestEmail(webapp.RequestHandler):
                        body=body)
 
     def __snippet_to_text(self, snippet):
-        divider = '-' * 30
-        retval = snippet.title() 
-        retval += '\n%s\n%s' % (divider, snippet.text)
-        logging.debug("OneDigestEmail __snippet_to_text snippets = %s ", retval)
+        divider = '-' * 50
+        retval = '%s\n%s\n%s\n%s' % (divider, snippet.title(), divider, snippet.text)
+        #logging.debug("OneDigestEmail __snippet_to_text snippets = %s ", retval)
         return retval
         
 
@@ -85,6 +84,7 @@ class OneDigestEmail(webapp.RequestHandler):
         user = user_from_email(self.request.get('email'))
         all_users = User.all().fetch(NUM_USERS)
         following = compute_following(user, all_users)
+        body = ''
         #Deal with weekly and daily snippets
         for wkly in (True, False):
             if (time_for_digest(wkly)):
@@ -98,8 +98,8 @@ class OneDigestEmail(webapp.RequestHandler):
                 w = s.user.weekly
                 logging.debug("OneDigestEmail s.user.email=%s s.user.weekly=%s", e, w)
                 if (e in following and w == wkly):
-                    body += '\n\n' + self.__snippet_to_text(s)
+                    body += '\n' + self.__snippet_to_text(s)
         if body:
-            self.__send_mail(user.email, PROJECT_URL + '\n\n' + body)
+            self.__send_mail(user.email, PROJECT_URL + '\n' + body)
         else:
             logging.info(user.email + ' not following anybody.')
