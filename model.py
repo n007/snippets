@@ -72,7 +72,7 @@ def create_or_replace_snippet(user, text, date, weekly):
     #Handling by fetching few (instead 1) and deleting them
     #TODO: add transaction support
     TRANS_SALT=10
-    for existing in Snippet.all().filter("date =", date).filter("user =", user).fetch(TRAN_SALT):
+    for existing in Snippet.all().filter("date =", date).filter("user =", user).fetch(TRANS_SALT):
         existing.delete()
     # Write new
     snippet = Snippet(text=text, user=user, date=date, weekly=weekly)
