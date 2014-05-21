@@ -10,19 +10,39 @@ Snippets is a process that has been used internally at Google for team communica
 Rather than handling this problem with long meetings or micromanagement, Snippets takes a different approach. An email is sent out to all team members asking them to reply with a bullet list summarizing what they did and what they plan to work on. These lists, termed snippets, are automatically compiled and emailed out to the entire team. The snippets are also saved to a database that anyone on the team can browse using a web app. The result is that any team member can quickly get a general overview of what's going on, such as a project's status or what others are doing, without disrupting flow.
 </td></tr></table>
 
-<ul class="simple"><li>How can I learn more about backend of this project?</li></ul>
+<ul class="simple"><li>How can I learn more about the backend of this project?</li></ul>
 <table><tr><td><div style="width: 35px"></div></td><td align=justify>
-Favorite question. You can read more about design, architeture, and implementation of this project from this 
+Favorite question. You can read more about design, architeture, and implementation of this project from 
 <a class="light" href="https://docs.google.com/a/rocketfuelinc.com/document/d/1npaScAPm-Y8-w1x5ZpVmpsC-n-XchPZSk95ShOkgKaQ">
-spec document</a>
+ spec document</a>
 </td></tr></table>
 
-<ul class="simple"><li>How do I control what I get in snippet digest?</li></ul>
+<ul class="simple"><li>What are different moving parts of this application?</li></ul>
 <table><tr><td><div style="width: 35px"></div></td><td align=justify>
-You receive snippets from users you are following and all users from a group you are following. You can control what you want to receive by 'following' or 'unfollowing' users or groups. You can always read all snippets from the web app. 
+Not many. As detailed in the
+<a class="light" href="https://docs.google.com/a/rocketfuelinc.com/document/d/1npaScAPm-Y8-w1x5ZpVmpsC-n-XchPZSk95ShOkgKaQ">
+ spec document</a>,
+reminder email to submit snippet, digest of compiled snippets, and this web app are three main components.
 </td></tr></table>
 
-<ul class="simple"><li>Do I have to reply to reminder email for this to work?</li></ul>
+<ul class="simple"><li>Looks like I don't need to use this web UI that often, right?</li></ul>
+<table><tr><td><div style="width: 35px"></div></td><td align=justify>
+On very first login you will be automatically enerted into the system. After that you can work completely off reminder and digest emails. 
+Web UI will allow you to 'follow' and 'unfollow' users and groups, browser snippet archive, and change your preferences.
+</td></tr></table>
+
+<ul class="simple"><li>When I will receive reminder and digest emails?</li></ul>
+<table><tr><td><div style="width: 35px"></div></td><td align=justify>
+If you are on the daily snippet schedule, remider will be sent out towards the end of the day and digest in the morning of the following day.<br>
+For the weekly schedule, Friday evening is reminder time and following Monday morning is the digest time.
+</td></tr></table>
+
+<ul class="simple"><li>How do I control what I get in Snippet Digest?</li></ul>
+<table><tr><td><div style="width: 35px"></div></td><td align=justify>
+You receive snippets from users you are following and all users from a group you are following. You can control what you want to receive by 'following' or 'unfollowing' users or groups. You can always read all snippets from the web UI. 
+</td></tr></table>
+
+<ul class="simple"><li>Do I have to reply to specific reminder email for all this to work?</li></ul>
 <table><tr><td><div style="width: 35px"></div></td><td align=justify>
 No. You can send your snippets directly to the 
 <a class="light" href="mailto:snippets@noted-tesla-574.appspotmail.com?Subject=snippet%20time" target="_top">snippet alias</a>
@@ -37,6 +57,11 @@ For your convenience system tries to remind you about snippets until either you 
 <ul class="simple"><li>I missed few snippet submissions, can I backfill?</li></ul>
 <table><tr><td><div style="width: 35px"></div></td><td align=justify>
 Yes you can. Reply to any reminder email and change the date in the subject line to match the date you want to backfill for. If you are on weekly snippet schedule make sure you pick the Monday you are submitting snippets for.
+</td></tr></table>
+
+<ul class="simple"><li>How do I provide feedback, comments, suggestions, or report issues?</li></ul>
+<table><tr><td><div style="width: 35px"></div></td><td align=justify>
+You are most welcome. You can send them to <a class="light" href="mailto:snippets@rocketfuelinc.com?Subject=snippets%20feedback" target="_top">snippets@rocketfuelinc.com</a>
 </td></tr></table>
 
 {% endblock %}
