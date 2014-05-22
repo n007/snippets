@@ -27,7 +27,6 @@ class ReminderEmail(webapp.RequestHandler):
         for user in all_users:
             #skip if weekly user and its not time for reminder, else set snippet date
             wkly = user.weekly;
-            logging.debug("ReminderEmail weekly = %s ", wkly)
             if (time_for_reminder(wkly)):
                 date = date_for_snippet(wkly)
             else:
@@ -35,9 +34,10 @@ class ReminderEmail(webapp.RequestHandler):
             #check if snippet already exists for this date, if so don't remind
             try:
                 snippet = Snippet.all().filter("date =", date).filter("user =", user).fetch(1)[0].text
-                logging.debug("ReminderEmail snippets = %s ", snippet)
+                #logging.debug("ReminderEmail snippets = %s ", snippet)
+                logging.info("ReminderEmail skipping sending reminder to = %s ", user.email)
             except IndexError:
-                logging.debug("ReminderEmail sending reminder to = %s ", user.email)
+                logging.info("ReminderEmail sending reminder to = %s ", user.email)
                 subject = '[REMINDER] snippet time for '
                 subject += 'week of ' if wkly else ''
                 subject += str(date)
@@ -96,7 +96,7 @@ class OneDigestEmail(webapp.RequestHandler):
             for s in all_snippets:
                 e = s.user.email
                 w = s.user.weekly
-                logging.debug("OneDigestEmail s.user.email=%s s.user.weekly=%s", e, w)
+                #logging.debug("OneDigestEmail s.user.email=%s s.user.weekly=%s", e, w)
                 if (e in following and w == wkly):
                     body += '\n' + self.__snippet_to_text(s)
         if body:

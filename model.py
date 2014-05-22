@@ -65,7 +65,7 @@ def compute_following(current_user, users):
 def user_from_email(email):
     #Handle emails from rocketfuel.com domain as if rocketfuelinc.com
     email = email.replace(EMAIL_REPALCE_FROM, EMAIL_REPALCE_TO, 1);
-    logging.debug("user_from_email email = %s ", email)
+    #logging.debug("user_from_email email = %s ", email)
     return User.all().filter("email =", email).fetch(1)[0]
 
 
@@ -82,4 +82,4 @@ def create_or_replace_snippet(user, text, date, weekly):
     # Write new
     snippet = Snippet(text=text, user=user, date=date, weekly=weekly)
     snippet.put()
-    logging.debug("create_or_replace_snippet user=%s, date=%s, weekly=%s, text=%s  ", user, date, weekly, text)
+    #logging.debug("create_or_replace_snippet user=%s, date=%s, weekly=%s, text=%s  ", user, date, weekly, text)
