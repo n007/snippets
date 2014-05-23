@@ -14,7 +14,7 @@ from model import *
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('configs/snippet.cfg')
 NUM_USERS = CONFIG.getint('Global','num_users')
-SIG_PATTERN = CONFIG.getint('Emails','signature_pattern')
+SIG_PATTERN = CONFIG.get('Emails','signature_pattern')
 
 class ReceiveEmail(InboundMailHandler):
     #Receive a snippet email and create or replace snippetS
