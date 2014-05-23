@@ -14,14 +14,14 @@ from model import *
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('configs/snippet.cfg')
 NUM_USERS = CONFIG.getint('Global','num_users')
-
+SIG_PATTERN = CONFIG.getint('Emails','signature_pattern')
 
 class ReceiveEmail(InboundMailHandler):
     #Receive a snippet email and create or replace snippetS
 
     def receive(self, message):
         user = user_from_email(email.utils.parseaddr(message.sender)[1])
-        signature = email.utils.parseaddr(message.sender)[0]
+        signature = user.pretty_name() + SIG_PATTERN
         subject = message.subject
         wkly = user.weekly
         date = date_for_snippet(wkly)
