@@ -57,7 +57,7 @@ class ReceiveEmail(InboundMailHandler):
             content = split_email[0]
             #logging.debug("ReminderEmail content = %s ", content)
             
-            reply_pattern = re.compile(r'^On.*at.*snippets', re.MULTILINE)
+            reply_pattern = re.compile(r'On.*at.*snippets.*wrote', re.MULTILINE)
             split_email = re.split(reply_pattern, content)
             content = split_email[0]
             #logging.debug("ReminderEmail content = %s ", content)
