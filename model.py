@@ -17,7 +17,7 @@ class User(db.Model):
     enabled = db.BooleanProperty(default=True)
     tags = db.StringListProperty()
     tags_following = db.StringListProperty()
-    weekly = db.BooleanProperty(default=False)
+    weekly = db.BooleanProperty(default=True)
     
     def pretty_name(self):
         return self.email.split('@')[0]
@@ -27,7 +27,7 @@ class Snippet(db.Model):
     user = db.ReferenceProperty(User)
     text = db.TextProperty()
     date = db.DateProperty()
-    weekly = db.BooleanProperty(default=False)
+    weekly = db.BooleanProperty(default=True)
 
     def title(self):
       return self.user_title() + ' ' + self.date_title()
