@@ -1,21 +1,73 @@
 {% extends "base.html" %}
 
 {% block body %}
-
   <div style="float: left; width: 300px">
-    <h2>{{ tag }}</h2>
+    <h2>{{ tag|title }}</h2>
     {% if following %}
-      ✓ <a class="light" href="/unfollow?tag={{ tag }}&continue=/tag/{{ tag }}">unfollow</a>
+      Status: following ✓ <a class="light" href="/unfollow?tag={{ tag }}&continue=/tag/{{ tag }}">unfollow</a>
     {% else %}
-      <a class="light" href="/follow?tag={{ tag }}&continue=/tag/{{ tag }}">follow</a>
+      Status: not following <a class="light" href="/follow?tag={{ tag }}&continue=/tag/{{ tag }}">follow</a>
     {% endif %}
   </div>
-  
-  <div style="float: left; margin-left: 30px; max-width: 600px">
-    {% for snippet in snippets %}
-		<b>{{ snippet.title }}</b><br/>
-      	<pre>{{ snippet.text|urlize }}</pre>
+
+  <div style="float: left; margin-left: 30px; max-width: 650px">
+    <!-- Snippet count drop down -->
+    <div>
+        Snippets per user:
+        <select id="select_count" class="span1" name="count">
+            {% for index in "X_X_X_X_X_" %}
+              <option value="{{ forloop.counter0|add:"1" }}">{{ forloop.counter0|add:"1" }}</option>
+            {% endfor %}
+        </select>
+
+    <!-- Toggle all button -->
+    <button id="toggle_all"  style="float:right;" class="btn btn-small" type="button">Toggle all</button>
+    </div>
+
+    <!-- Show all user snippets -->
+    {% for user in all_snippets %}
+		<div data-toggle="collapse" data-target="#{{user.name|cut:' '}}" class="alert alert-info accordion-toggle" style="margin-top:10px">
+            <h4>Snippets of {{user.name}}</h4>
+        </div>
+        <div id="{{user.name|cut:' '}}" class="accordian-body collapse">
+        {% if user.snippets %}
+            {% for snippet in user.snippets %}
+                <b>{{ snippet.date }}</b><br/>
+                <pre>{{ snippet.trimmed_text|urlize }}</pre>
+            {% endfor %}
+        {% else %}
+            <div>No snippets found from {{user.name}} :(</div>
+        {% endif %}
+        </div>
     {% endfor %}
    </div>
 
+<script type="text/javascript">
+var expanded = 0;
+$("#select_count").val({{count_to_show}});
+
+function toggle_all(){
+    $('.collapse').each(function (index) {
+        if(expanded == 0){
+            $(this).collapse("show");
+        } else {
+            $(this).collapse("hide");
+        };
+    });
+    expanded = 1 - expanded;
+};
+
+// For now show all
+toggle_all();
+
+$("#toggle_all").click(function(){
+    toggle_all();
+});
+
+$("#select_count").change(function() {
+    window.location = "/tag/{{ tag }}?count="+$("#select_count").val();
+});
+</script>
+
 {% endblock %}
+

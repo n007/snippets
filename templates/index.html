@@ -2,92 +2,170 @@
 
 {% block body %}
 
-<h2><a class="simple" style="color: black" href="/user/{{ current_user.email }}">welcome {{ current_user.pretty_name }}</a></h2>
+<!--style>
+.headerDivider {
+     border-left:1px solid #38546d;
+     border-right:1px solid #16222c;
+     height:80px;
+     position:absolute;
+     right:;
+     top:10px;
+}
+</style>
 
-<ul class="simple">
-	<li>manage your profile 
-	 <a class="light" href="/user/{{ current_user.email }}" style="font-size: 75%">
-			( logged in as: {{ current_user.email }} )</a></li>
-</ul>
-<table>
-	<tr>
-    <td><div style="width: 35px"></div></td>
-	<td style="font-size: 90%">
-    {% if current_user.enabled %}
-       ✓ snippet stauts -- enabled &nbsp;[<a class="light" href="?setenabled=0"> disable it </a>]
-    {% else %}
-       ✓ snippet stauts -- disabled &nbsp;[<a class="light" href="?setenabled=1"> enable it </a>]
-    {% endif %}
+<div>
+<div style="float:left; min-width:200px;">Column 1</div>
+<div class="headerDivider"></div>
+<div style="float:left; min-width:200px;">Column 2</div>
+<div class="headerDivider"></div>
+<div style="float:left; min-width:200px;">Column 3</div>
+<div style="clear:both"></div>
+</div-->
 
-    <br><br>
-    {% if current_user.weekly %}
-       ✓ snippet freq. ---- weekly &nbsp;[<a class="light" href="?setweekly=0"> make it daily </a>]
-    {% else %}
-       ✓ snippet freq. ---- daily &nbsp;[<a class="light" href="?setweekly=1"> make it weekly </a>]
-    {% endif %}
 
-    <br><br>
-    <form action="/" method="get">
-	  {% if current_user.tags %}
-	    ✓ group status ---- {{ current_user.tags.0 }} 
-	  {% else %}
-		✓ group status ---- none
-	  {% endif %}
-	  &nbsp;[     
-	  <select name="tags">;
-		<option value="engineering">select/change your group</option>
-	    <option value="hbase">hbase</option>
-		<option value="hive">hive</option>
-		<option value="modeling infrastructure">modeling infrastructure</option>
-		<option value="data processing">data processing</option>
-		<option value="data infrastructure">data infrastructure</option>
-		<option value="serving infrastructure">serving infrastructure</option>
-		<option value="modeling">modeling</option>
-		<option value="optimization">optimization</option>
-		<option value="mobile">mobile</option>		
-		<option value="apps">apps</option>
-		<option value="ground control">ground control</option>
-		<option value="engineering">engineering</option>
-		<option value="product">product</option>		
-		<input type="submit" value="submit" onclick="{{ current_user.tags|join:"," }}">									
-	  </select>	
-	  ]
-	</form>
-    </td></tr>
-</table>
+<div id="user_groups" style="float:left">
+<div class="col-lg-6" style="width:400px">
+ <div class="panel panel-default">
+  <div class="panel-heading"><h3>User groups</h3></div>
+   <div class="panel-body">
+    <button id="toggle_all"  style="float:right; margin-top:-30px" class="btn btn-small" type="button">Toggle all</button>
+    <table class="table table-bordered table-condensed" style="border-collapse:collapse;">
+    <tbody>
+      {% for tag_group in tag_groups %}
+
+        <!-- Set the row header -->
+        {% if tag_group.following %}
+          <tr data-toggle="collapse" data-target="#{{tag_group.name|cut:' '}}" class="success accordion-toggle">
+              <td>{{tag_group.name|title}}
+                   <a href="/tag/{{ tag_group.name }}">[Snippets]</a>
+                   <a class="light" href="/unfollow?tag={{ tag_group.name }}&continue=/">[unfollow]</a>
+              </td>
+          </tr>
+        {% else %}
+          <tr data-toggle="collapse" data-target="#{{tag_group.name|cut:" "}}" class="info accordion-toggle">
+              <td>{{tag_group.name|title}}
+                   <a href="/tag/{{ tag_group.name }}">[Snippets]</a>
+                   <a class="light" href="/follow?tag={{ tag_group.name }}&continue=/">[follow]</a>
+              </td>
+          </tr>
+        {% endif %}
+
+        <tr class="hiddenRow"><td>
+         <div id="{{tag_group.name|cut:' '}}" class="accordian-body collapse">
+          <table class="table table-condensed" style="margin-bottom:0px">
+           {% for tag_user in tag_group.users %}
+             <tr><td>
+                 -- <a href="/user/{{ tag_user.0.email }}">{{tag_user.0.pretty_name}}</a>
+                {% if tag_user.0.pretty_name != tag_user.0.user_id %}
+                    ({{tag_user.0.user_id}})
+                {% endif %}
+                {% if tag_user.1 %}
+                    <a class="light" href="/unfollow?user={{ tag_user.0.email }}&continue=/">[unfollow]</a>
+                {% else %}
+                    <a class="light" href="/follow?user={{ tag_user.0.email }}&continue=/">[follow]</a>
+                {% endif %}
+            </td></tr>
+          {% endfor %}
+         </table>
+        </div>
+       </td></tr>
+      {% endfor %}
+    </tbody>
+   </table>
+  </div>
+ </div>
+</div>
+</div>
+
+<div id="divider" style="float:left; margin:100px 0 0 100px"></div>
+
+<div id="user_profile" style="float:left">
+<div>
+    <h3> Manage Profile </h3>
+    <p>Email id: <em style="background-color:lightcyan">{{current_user.email}}</em> [<a href="/user/{{current_user.email}}">Snippets</a>]
+    </p>
+    <form id="user_profile_form" action="/user/{{current_user_details.email_id}}" method="post">
+        <label>Name:
+            <input type="text" name="user_name" placeholder="Your full name"></input>
+        </label>
+        <label class="checkbox">
+            <input name="enable_reminder" type="checkbox">Enable snippet reminder email</input>
+        </label>
+        <label class="radio inline">
+            <input type="radio" name="frequency" value="weekly" checked>Weekly</input>
+        </label>
+        <label class="radio inline">
+            <input type="radio" name="frequency" value="daily">Daily</input>
+        </label>
+        </br> </br>
+        <label class="dropdown">Select your group:
+            <select name="group">;
+              <option value="apps">Apps</option>
+              <option value="data processing">Data Processing</option>
+              <option value="data infrastructure">Data Infrastructure</option>
+              <option value="engineering">Engineering</option>
+              <option value="ground control">Ground Control</option>
+              <option value="hbase">Hbase</option>
+              <option value="hive">Hive</option>
+              <option value="mobile">Mobile</option>
+              <option value="modeling">Modeling</option>
+              <option value="modeling infrastructure">Modeling Infrastructure</option>
+              <option value="optimization">Optimization</option>
+              <option value="product">Product</option>
+              <option value="serving infrastructure">Serving Infrastructure</option>
+            </select>
+        </label>
+        <button type="submit" class="btn" style="align:right">Update profile</button>
+    </form>
+    <!-- Update form fields if we already have data -->
+    <script>
+        $(document).ready(function() {
+            var fid = "#user_profile_form";
+            {% if current_user_details.user.display_name %}
+                $(fid + " input[name='user_name']").val("{{current_user_details.user.display_name}}");
+            {% endif %}
+            {% if current_user_details.user.enabled %}
+                $(fid + " input[name='enable_reminder']").attr("checked", "checked");
+            {% endif %}
+            {% if current_user_details.user.weekly %}
+                var text = "weekly";
+            {% else %}
+                var text = "daily";
+            {% endif %}
+            $(fid + " input[name='frequency'][value='"+text+"']").attr("checked", "checked");
+            $(fid + " select[name='group']").val("{{current_user_details.user.tags.0}}");
+        });
+    </script>
+<hr>
 <br>
-<ul class="simple"><li>
-	<a class="simple" href="/faq/{{ current_user.email }}">
-	  learn more about snippets, how this works, and FAQs
-    </a>
-</li></ul>
-<table cellspacing=20>
-	<tr>
-      	<td valign="top">
-			    <h3>all snippet users</h3>
-			    {% for user in all_users %}
-			      <a class="simple" href="/user/{{ user.0.email }}">{{ user.0.pretty_name }}</a>&nbsp;
-			      {% if user.1 %}
-			        ✓ <a class="light" href="/unfollow?user={{ user.0.email }}&continue=/">unfollow</a>
-			      {% else %}
-			        <a class="light" href="/follow?user={{ user.0.email }}&continue=/">follow</a>
-			      {% endif %}      
-			      <br/>
-			    {% endfor %}
-		     </td>
-				 <td valign="top">        
-  			   <h3>all snippet groups</h3>
-	 		     {% for tag in all_tags %}
-			       <a class="simple" href="/tag/{{ tag.0 }}">{{ tag.0 }}</a>&nbsp;
-			       {% if tag.1 %}
-			         ✓ <a class="light" href="/unfollow?tag={{ tag.0 }}&continue=/">unfollow</a>
-			       {% else %}
-			         <a class="light" href="/follow?tag={{ tag.0 }}&continue=/">follow</a>
-		        {% endif %}
-		        <br/>
-		      {% endfor %}      
-	    </td>
-	</tr>
-</table>
+<h3>Quick tips/suggestions:</h3>
+<ul>
+<li><b>Avoid putting complex signatures in email.</b></li>
+<li><b>Always use bullet points only when sending snippets.</b></li>
+<li>You can update your snippets in a previous date as well by changing date in email subject.</li>
+<li>Each daily/weekly update should be sent in a separate email.</li>
+</ul>
+</div>
+<br>
+<a class="simple" href="/faq/{{ current_user.email }}">
+Learn more about snippets, how this works, and FAQs
+</a>
+</div>
+</div>
 
+<script>
+$('#{{current_user.tags.0|cut:" "}}').collapse("show");
+
+var expanded = 0;
+$("#toggle_all").click(function(){
+    $('.collapse').each(function (index) {
+        if(expanded == 0){
+            $(this).collapse("show");
+        } else {
+            $(this).collapse("hide");
+        };
+    });
+    expanded = 1 - expanded;
+});
+</script>
 {% endblock %}

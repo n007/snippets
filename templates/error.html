@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <!-- One by one check for the error code and print message -->
+    <h4> Error occurred </h4>
+    {% if error_type == 'invalid_domain' %}
+        Current login id is {{current_user_details.email_id}}. Login using <b>{{current_user_details.company_name}}</b> user id!
+    {% else %}
+        Contact app administrator.
+    {% endif %}
+{% endblock %}

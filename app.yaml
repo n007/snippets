@@ -1,5 +1,5 @@
-application: snippets
-version: 5
+application: noted-tesla-574
+version: 6
 runtime: python27
 api_version: 1
 threadsafe: false
@@ -9,10 +9,13 @@ handlers:
   script: receive_email.py
   login: admin
 
+- url: /static
+  static_dir : static
+
 - url: .*
   script: main.py
   secure: always
-    
+
 inbound_services:
 - mail
 
@@ -21,3 +24,6 @@ libraries:
   version: latest
 - name: jinja2
   version: latest
+
+builtins:
+- remote_api: on

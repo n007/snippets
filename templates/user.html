@@ -3,7 +3,7 @@
 {% block body %}
 
   <div style="float: left; width: 300px">
-	<h2>users</h2>
+	<h2>User</h2>
 	{{ user.email }}&nbsp;
     {% if following %}
       ✓ <a class="light" href="/unfollow?user={{ user.email }}&continue=/user/{{ user.email }}">unfollow</a>
@@ -12,22 +12,22 @@
     {% endif %}
 	<br>
 	{% if user.enabled %}
-	  <font color=#2398C9 size=2>status enabled</font>
+	  <font color=#2398C9 size=2>Status: enabled</font>
 	{% else %}
-	  <font color=#2398C9 size=2>status disabled</font>
+	  <font color=#2398C9 size=2>Status: disabled</font>
 	{% endif %}	
 	<br>
 	{% if user.weekly %}
-	  <font color=#2398C9 size=2>on weekly snippets</font>
+	  <font color=#2398C9 size=2>Frequency: on weekly snippets</font>
 	{% else %}
-	  <font color=#2398C9 size=2>on daily snippets</font>
+	  <font color=#2398C9 size=2>Frequency: on daily snippets</font>
 	{% endif %}
 
     <br/></br>
 	
-    <h2>groups</h2>
+    <h2>Groups</h2>
     {% for tag in tags %}
-        {{ tag.0 }}&nbsp;
+        {{ tag.0|title}}&nbsp;
 		    {% if tag.1 %}
 		      ✓ <a class="light" href="/unfollow?tag={{ tag.0 }}&continue=/user/{{ user.email }}">unfollow</a>
 		    {% else %}
@@ -38,8 +38,8 @@
   
   <div style="float: left; margin-left: 30px; max-width: 600px">
     {% for snippet in snippets %}
-      <b>{{ snippet.date_title }}</b><br/>
-      <pre>{{ snippet.text|urlize }}</pre>
+      <b>{{ snippet.date}}</b><br/>
+      <pre>{{ snippet.trimmed_text|urlize }}</pre>
     {% endfor %}
   </div>
 

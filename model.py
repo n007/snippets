@@ -9,19 +9,35 @@ CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('configs/snippet.cfg')
 EMAIL_REPALCE_FROM = CONFIG.get('Model','email_replace_from')
 EMAIL_REPALCE_TO = CONFIG.get('Model','email_replace_to')
-
+EMAIL_DOMAINS = CONFIG.get('Model', 'email_domains').split()
+DEFAULT_USER_TAGS = ['engineering']
 
 class User(db.Model):
     email = db.StringProperty()
+    display_name = db.StringProperty(default='')
     following = db.StringListProperty()
     enabled = db.BooleanProperty(default=True)
-    tags = db.StringListProperty()
+    tags = db.StringListProperty(default=DEFAULT_USER_TAGS)
     tags_following = db.StringListProperty()
     weekly = db.BooleanProperty(default=True)
-    
-    def pretty_name(self):
+
+    def user_id(self):
         return self.email.split('@')[0]
 
+    def pretty_name(self):
+        return self.display_name or self.user_id()
+
+    def first_name(self):
+        if self.display_name:
+            return self.display_name.split()[0]
+        else:
+            return self.user_id()
+
+    def last_name(self):
+        if self.display_name:
+            return self.display_name.split()[-1]
+        else:
+            return None
 
 class Snippet(db.Model):
     user = db.ReferenceProperty(User)
@@ -41,6 +57,9 @@ class Snippet(db.Model):
       else:
         return 'for ' + str(self.date)
 
+    def trimmed_text(self):
+        return self.text.strip()
+
 
 def compute_following(current_user, users):
     #Return set of email addresses being followed by this user.
@@ -52,14 +71,14 @@ def compute_following(current_user, users):
     try:
         tag_set.add(current_user.tags[-1])
     except IndexError:
-        logging.warning("computing groups following without group for user=%s", current_user.email)    
+        logging.warning("computing groups following without group for user=%s", current_user.email)
     #logging.debug("compute_following, user = %s ", current_user.email)
     for u in users:
         if ((u.email in email_set) or
             (len(tag_set.intersection(u.tags)) > 0)):
             following.add(u.email)
             #logging.debug("compute_following, user = %s ", u.email)
-    return following 
+    return following
 
 
 def user_from_email(email):

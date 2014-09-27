@@ -1,0 +1,17 @@
+Develop/test changes on your local system
+-----------------------------------------
+1. Install Google App Engine SDK
+2. Checkout the code from git repo
+3. Download latest data from current deployed application:
+`appcfg.py download_data -vvvv --url=https://<app_name>.appspot.com/_ah/remote_api --filename=/tmp/snippetdb`
+For this command to work correctly, make sure remote_api is enabled. For this you will need to add following lines to app.yaml
+
+==================
+builtins:
+- remote_api: on
+==================
+
+4. Upload data to local app on your system. Also the data is in google proprietry format so don't try to simply open it using sqlite!
+`appcfg.py upload_data -vvvv --url=http://localhost:8080/_ah/remote_api --filename=/tmp/snippetdb`
+
+You will need to mention an admin email_id during this which can be any email id you used with "Enable Admin user" when trying to open the app on http://localhost:8080 in your browser.
