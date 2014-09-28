@@ -36,16 +36,24 @@
         <!-- Set the row header -->
         {% if tag_group.following %}
           <tr data-toggle="collapse" data-target="#{{tag_group.name|cut:' '}}" class="success accordion-toggle">
-              <td>{{tag_group.name|title}}
+              <td>
+                    <div style="float:left">
+                    {{tag_group.name|title}}
                    <a href="/tag/{{ tag_group.name }}">[Snippets]</a>
                    <a class="light" href="/unfollow?tag={{ tag_group.name }}&continue=/">[unfollow]</a>
+                    </div>
+                    <span class="badge" style="float:right">{{tag_group.users_following_count}}/{{tag_group.users|length}}</span>
               </td>
           </tr>
         {% else %}
           <tr data-toggle="collapse" data-target="#{{tag_group.name|cut:" "}}" class="info accordion-toggle">
-              <td>{{tag_group.name|title}}
+                <td>
+                    <div style="float:left">
+                      {{tag_group.name|title}}
                    <a href="/tag/{{ tag_group.name }}">[Snippets]</a>
                    <a class="light" href="/follow?tag={{ tag_group.name }}&continue=/">[follow]</a>
+                    </div>
+                    <span class="badge" style="float:right">{{tag_group.users_following_count}}/{{tag_group.users|length}}</span>
               </td>
           </tr>
         {% endif %}
@@ -141,9 +149,9 @@
 <h3>Quick tips/suggestions:</h3>
 <ul>
 <li><b>Avoid putting complex signatures in email.</b></li>
-<li><b>Always use bullet points only when sending snippets.</b></li>
+<li><b>Stick to bullet points only in snippet message.</b></li>
 <li>You can update your snippets in a previous date as well by changing date in email subject.</li>
-<li>Each daily/weekly update should be sent in a separate email.</li>
+<li>Feel free to mail any bugs/suggestions at <a href="mailto:snippets@rocketfuelinc.com">snippets@rocketfuelinc.com</a>.</li>
 </ul>
 </div>
 <br>

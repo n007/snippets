@@ -128,21 +128,22 @@ class UserHandler(BaseHandler):
         user.put()
         self.redirect('/', permanent=True)
 
-
     @authenticated
     def get(self, email):
         user = self.get_user()
+        count = int(self.request.get('count') or DEFAULT_TAGLIST_COUNT)
         email = urllib.unquote_plus(email)
         desired_user = user_from_email(email)
         snippets = desired_user.snippet_set
-        snippets = sorted(snippets, key=lambda s: s.date, reverse=True)
-        following = email in user.following
-        tags = [(t, t in user.tags_following) for t in desired_user.tags]
+        snippets = sorted(snippets, key=lambda s: s.date, reverse=True)[0:count]
+        following = email in user.following or any(set(desired_user.tags).intersection(user.tags))
+        tags = [(t, t in user.tags_following or t in user.tags) for t in desired_user.tags]
         template_values = {
                            'current_user' : user,
                            'user': desired_user,
                            'snippets': snippets,
                            'following': following,
+                           'count_to_show': count,
                            'tags': tags
                            }
         self.render('user', template_values)
@@ -192,22 +193,17 @@ class TagHandler(BaseHandler):
         count = self.request.get('count') or DEFAULT_TAGLIST_COUNT
         count = int(count)
         user = self.get_user()
-        following = tag in user.tags_following
+        following = tag in user.tags_following or tag in user.tags
         all_snippets = []
 
         all_users = User.all()
         users_in_tag = [user for user in all_users if tag in user.tags]
         for user in users_in_tag:
             data = {'name': user.pretty_name(),
-                    'snippets': sorted(user.snippet_set[0:count],
-                                       key=lambda x:x.date, reverse=True)}
+                    'snippets': sorted(user.snippet_set, key=lambda x:x.date,
+                                       reverse=True)[0:count]}
             all_snippets.append(data)
-#        for wkly in (True, False):
-#            date = date_for_retrieval(wkly)
-#            dated_snippets = Snippet.all().filter("date =", date).fetch(NUM_USERS)
-#            for s in dated_snippets:
-#                if (tag in s.user.tags and s.user.weekly == wkly):
-#                    all_snippets.append(s)
+        all_snippets = sorted(all_snippets, key=lambda x:x['name'])
         template_values = {
                            'current_user' : user,
                            'all_snippets': all_snippets,
@@ -241,6 +237,8 @@ class MainHandler(BaseHandler):
                                                    if tag in u.tags]
             tag_info['users'] = sorted(tag_users,
                                        key=lambda x:x[0].pretty_name())
+            following_count = sum(x[1] for x in tag_users)
+            tag_info['users_following_count'] = following_count
             tag_groups.append(tag_info)
         tag_groups = sorted(tag_groups, key=lambda x:x['name'])
         template_values = {'current_user': user, 'all_users': tag_groups,

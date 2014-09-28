@@ -15,7 +15,7 @@
 	  <font color=#2398C9 size=2>Status: enabled</font>
 	{% else %}
 	  <font color=#2398C9 size=2>Status: disabled</font>
-	{% endif %}	
+	{% endif %}
 	<br>
 	{% if user.weekly %}
 	  <font color=#2398C9 size=2>Frequency: on weekly snippets</font>
@@ -24,7 +24,7 @@
 	{% endif %}
 
     <br/></br>
-	
+
     <h2>Groups</h2>
     {% for tag in tags %}
         {{ tag.0|title}}&nbsp;
@@ -35,12 +35,38 @@
 		    {% endif %}
     {% endfor %}
   </div>
-  
-  <div style="float: left; margin-left: 30px; max-width: 600px">
-    {% for snippet in snippets %}
-      <b>{{ snippet.date}}</b><br/>
-      <pre>{{ snippet.trimmed_text|urlize }}</pre>
-    {% endfor %}
+
+  <div style="float: left; margin-left: 30px; min-width: 600px; max-width:700px">
+    <!-- Snippet count drop down -->
+    <div style="float:right">
+        Snippets to fetch:
+        <select id="select_count" class="span1" name="count">
+            {% for index in "X_X_X" %}
+              <option value="{{ forloop.counter0|add:"1" }}">{{ forloop.counter0|add:"1" }}</option>
+            {% endfor %}
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+        </select>
+    </div>
+
+    <div style="clear:both">
+    {% if snippets %}
+        {% for snippet in snippets %}
+            <b>{{ snippet.date }}</b><br/>
+            <pre>{{ snippet.trimmed_text|urlize }}</pre>
+        {% endfor %}
+    {% else %}
+        No snippets found from {{user.pretty_name}} :(
+    {% endif %}
+    </div>
   </div>
 
+<script type="text/javascript">
+$("#select_count").val({{count_to_show}});
+
+$("#select_count").change(function() {
+    window.location = "/user/{{ user.email }}?count="+$("#select_count").val();
+});
+</script>
 {% endblock %}
