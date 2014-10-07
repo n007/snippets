@@ -1,15 +1,16 @@
 import logging
+import re
 import ConfigParser
 
 from google.appengine.api import users
 from google.appengine.ext import db
-
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('configs/snippet.cfg')
 EMAIL_REPALCE_FROM = CONFIG.get('Model','email_replace_from')
 EMAIL_REPALCE_TO = CONFIG.get('Model','email_replace_to')
 EMAIL_DOMAINS = CONFIG.get('Model', 'email_domains').split()
+SIG_PATTERN = CONFIG.get('Emails','signature_pattern')
 DEFAULT_USER_TAGS = ['engineering']
 
 class User(db.Model):
@@ -58,7 +59,7 @@ class Snippet(db.Model):
         return 'for ' + str(self.date)
 
     def trimmed_text(self):
-        return self.text.strip()
+        return extract_snippets_from_msg(self.text.strip(), self.user)
 
 
 def compute_following(current_user, users):
@@ -102,3 +103,36 @@ def create_or_replace_snippet(user, text, date, weekly):
     snippet = Snippet(text=text, user=user, date=date, weekly=weekly)
     snippet.put()
     #logging.debug("create_or_replace_snippet user=%s, date=%s, weekly=%s, text=%s  ", user, date, weekly, text)
+
+
+def extract_snippets_from_msg(content, user):
+    """Given plain text body of a message, it tries to remove unwanted content
+    from message like signature, content from previous emails etc."""
+    # Note: Remember unwanted information is better than loosing information!!
+    user_sig = '{}{}'.format(user.user_id(), SIG_PATTERN)
+    #content = content.replace('<br>', '')
+
+    # Strip signatures beginning with --
+    sig_pattern = re.compile(r'^\-\-\s*$', re.MULTILINE)
+    split_email = re.split(sig_pattern, content)
+    content = split_email[0]
+
+    # Should match "On Sat, Oct 4, 2014 at 6:15 AM, (snippets|userid@domain)
+    pattern = (r'On [A-Z][a-z]{2}, [A-Z][a-z]{2} [0-9]{,2}, [0-9]{4} at '
+               '.*(snippets|' + user_sig + ').*')
+    reply_pattern = re.compile(pattern, re.MULTILINE)
+    split_email = re.split(reply_pattern, content)
+    content = split_email[0]
+
+    # Strip signatures matching *<NAME> .. *
+    reply_pattern = re.compile(r'^\*.*' + user_sig + '.*', re.MULTILINE)
+    split_email = re.split(reply_pattern, content)
+    content = split_email[0]
+
+    # Strip signatures matching ~Name
+    pattern = r'^~({}|{}|{})$'.format(user.user_id(), user.pretty_name(),
+                                      user.first_name())
+    reply_pattern = re.compile(pattern, re.MULTILINE)
+    split_email = re.split(reply_pattern, content)
+    content = split_email[0]
+    return content.strip()

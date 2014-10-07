@@ -60,7 +60,7 @@ class DigestEmail(webapp.RequestHandler):
         all_users = User.all().filter("enabled =", True).fetch(NUM_USERS)
         for user in all_users:
             taskqueue.add(url='/onedigest', params={'email': user.email})
-            
+
 
 class OneDigestEmail(webapp.RequestHandler):
     def __send_mail(self, recipient, body):
@@ -74,7 +74,7 @@ class OneDigestEmail(webapp.RequestHandler):
         retval = '%s\n%s\n%s\n%s' % (divider, snippet.title(), divider, snippet.text)
         #logging.debug("OneDigestEmail __snippet_to_text snippets = %s ", retval)
         return retval
-        
+
 
     def get(self):
         post(self)
@@ -90,7 +90,7 @@ class OneDigestEmail(webapp.RequestHandler):
             if (time_for_digest(wkly)):
                 date = date_for_retrieval(wkly)
             else:
-                continue    
+                continue
             logging.debug("OneDigestEmail wkly = %s user = %s date = %s", wkly, user, date)
             all_snippets = Snippet.all().filter("date =", date).fetch(NUM_USERS)
             for s in all_snippets:

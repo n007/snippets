@@ -8,6 +8,7 @@ from datetime import tzinfo, timedelta
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('configs/snippet.cfg')
 SNIPPET_PERIOD = CONFIG.get('DateTimeUtil','snippet_period')
+HTML5_DATE_FMT = '%Y-%m-%d'
 
 class USTimeZone(tzinfo):
 
@@ -19,14 +20,14 @@ class USTimeZone(tzinfo):
 
     def __repr__(self):
         return self.reprname
-        
+
     def __firstsunday(self, dt):
         #First Sunday on or after dt.
         return dt + datetime.timedelta(days=(6-dt.weekday()))
 
     def utcoffset(self, dt):
         return self.stdoffset + self.dst(dt)
-        
+
     def tzname(self, dt):
         if self.dst(dt):
             return self.dstname
@@ -50,7 +51,7 @@ class USTimeZone(tzinfo):
         dst_start = self.__firstsunday(datetime.datetime(dt.year, 3, 8, 2))
         # 1 am on the first Sunday in November
         dst_end = self.__firstsunday(datetime.datetime(dt.year, 11, 1, 1))
-        
+
         if dst_start <= dt.replace(tzinfo=None) < dst_end:
             return datetime.timedelta(hours=1)
         else:
@@ -76,7 +77,7 @@ def time_for_reminder(weeklysnippet):
     intday = today.weekday()
     if (weeklysnippet and intday > 1 and intday < 4):
         return False
-    return True    
+    return True
 
 
 def date_for_snippet(weeklysnippet):
@@ -123,8 +124,8 @@ def time_for_digest(weekly):
     elif ((not weekly) and intday < 5):
         return True
     #No digest
-    else:    
-        return False   
+    else:
+        return False
 
 
 def date_for_retrieval(weeklysnippet):
@@ -156,4 +157,26 @@ def date_for_daily_retrieval():
     snippet_day = today - datetime.timedelta(days=offset)
     logging.info("date_for_daily_retrieval = %s", snippet_day)
     return snippet_day
- 
+
+
+def html5_date(date_obj):
+    """Convert given object into HTML5 date string."""
+    return date_obj.strftime(HTML5_DATE_FMT)
+
+
+def html5_parse_date(date_str):
+    """Parses the standard HTML5 date type field of format YYYY-MM-DD."""
+    if not date_str:
+        return None
+    return datetime.datetime.strptime(date_str, HTML5_DATE_FMT).date()
+
+
+def get_today_date():
+    """Return today's date in YYYY-MM-DD format."""
+    return datetime.datetime.now().date()
+
+
+def get_week_before_date():
+    """Return 7 days previous date in YYYY-MM-DD format."""
+    today = datetime.datetime.now()
+    return (today - datetime.timedelta(days=7)).date()

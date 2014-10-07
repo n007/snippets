@@ -187,11 +187,20 @@ class UnfollowHandler(BaseHandler):
 
 class TagHandler(BaseHandler):
     #View this week's snippets in a given tag.
-
     @authenticated
     def get(self, tag):
+        """Handler for get request."""
+        def filter_by_date(snippets, start_date, end_date):
+            """Filters given list of snippets by count."""
+            filtered = [snippet for snippet in snippets
+                                    if snippet.date <= end_date and
+                                       snippet.date >= start_date]
+            return filtered
+
         count = self.request.get('count') or DEFAULT_TAGLIST_COUNT
         count = int(count)
+        start_date = html5_parse_date(self.request.get('sd'))
+        end_date = html5_parse_date(self.request.get('ed'))
         user = self.get_user()
         following = tag in user.tags_following or tag in user.tags
         all_snippets = []
@@ -199,17 +208,27 @@ class TagHandler(BaseHandler):
         all_users = User.all()
         users_in_tag = [user for user in all_users if tag in user.tags]
         for user in users_in_tag:
-            data = {'name': user.pretty_name(),
-                    'snippets': sorted(user.snippet_set, key=lambda x:x.date,
-                                       reverse=True)[0:count]}
+            data = {'name': user.pretty_name()}
+            snippets = sorted(user.snippet_set, key=lambda x:x.date,
+                              reverse=True)
+            if start_date and end_date:
+                snippets = filter_by_date(snippets, start_date, end_date)
+            else:
+                snippets = snippets[0:count]
+            data['snippets'] = snippets
             all_snippets.append(data)
+
         all_snippets = sorted(all_snippets, key=lambda x:x['name'])
+        start_date = start_date or get_week_before_date()
+        end_date = end_date or get_today_date()
         template_values = {
                            'current_user' : user,
                            'all_snippets': all_snippets,
                            'following': following,
                            'tag': tag,
-                           'count_to_show': count
+                           'count_to_show': count,
+                           'start_date': html5_date(start_date),
+                           'end_date': html5_date(end_date)
                            }
         self.render('tag', template_values)
 

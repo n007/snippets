@@ -10,41 +10,66 @@
     {% endif %}
   </div>
 
+
   <div style="float: left; margin-left: 30px; min-width: 600px; max-width:700px">
     <!-- Snippet count drop down -->
     <div>
-        Snippets per user:
-        <select id="select_count" class="span1" name="count">
-            {% for index in "X_X_X_X_X_" %}
-              <option value="{{ forloop.counter0|add:"1" }}">{{ forloop.counter0|add:"1" }}</option>
-            {% endfor %}
-        </select>
-
-    <!-- Toggle all button -->
-    <button id="toggle_all"  style="float:right;" class="btn btn-small" type="button">Toggle all</button>
-    </div>
-
-    <!-- Show all user snippets -->
-    {% for user in all_snippets %}
-		<div data-toggle="collapse" data-target="#{{user.name|cut:' '}}" class="alert alert-info accordion-toggle" style="margin-top:10px">
-            <h4>Snippets of {{user.name}}</h4>
+        <div class="form-inline">
+            <label class="date"><b>Start date:</b>
+                <input type="date" name="start_date" id="start_date" style="width:150px"/>
+            </label>
+            <label class="date" style="margin-left:20px"><b>End date:</b>
+                <input type="date" name="end_date" id="end_date" style="width:150px"/>
+            </label>
+            <button id="fetch_dated" class="btn btn-small" style="margin-left:20px" type="button">Fetch</button>
         </div>
-        <div id="{{user.name|cut:' '}}" class="accordian-body collapse">
-        {% if user.snippets %}
-            {% for snippet in user.snippets %}
-                <b>{{ snippet.date }}</b><br/>
-                <pre>{{ snippet.trimmed_text|urlize }}</pre>
-            {% endfor %}
-        {% else %}
-            <div>No snippets found from {{user.name}} :(</div>
-        {% endif %}
+        <!--hr style="margin-top:3px; margin-bottom:3px"-->
+        <div class="form-inline" style="margin-top:10px">
+            <label class="select">Snippets per user:
+                <select id="select_count" class="span1" name="count">
+                    {% for index in "X_X_X_X_X_" %}
+                      <option value="{{ forloop.counter0|add:"1" }}">{{ forloop.counter0|add:"1" }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <!-- Toggle all button -->
+          <div class="btn-group" style="float:right">
+            <button id="show_hide_empty_btn" class="btn btn-small btn-default">Hide Empty</button>
+            <button id="toggle_all" class="btn btn-small btn-primary">Toggle all</button>
+          </div>
         </div>
-    {% endfor %}
+
+      <!-- Show all user snippets -->
+      <div style="clear:both">
+        {% for user in all_snippets %}
+          <div class="user_snippets">
+            <div data-toggle="collapse" data-target="#{{user.name|cut:' '}}" class="alert alert-info accordion-toggle" style="margin-top:10px">
+                <h4>Snippets of {{user.name}}</h4>
+            </div>
+            <div id="{{user.name|cut:' '}}" class="accordian-body collapse">
+            {% if user.snippets %}
+                {% for snippet in user.snippets %}
+                    <b>{{ snippet.date }}</b><br/>
+                    <pre class="one_snippet">{{ snippet.trimmed_text|urlize }}</pre>
+                {% endfor %}
+            {% else %}
+                <div>No snippets found from {{user.name}} :(</div>
+            {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+     </div>
    </div>
 
 <script type="text/javascript">
 var expanded = 0;
-$("#select_count").val({{count_to_show}});
+var show_empty = 1;
+
+$(document).ready(function() {
+    $("#select_count").val({{count_to_show}});
+    $("#start_date").val("{{start_date}}");
+    $("#end_date").val("{{end_date}}");
+});
 
 function toggle_all(){
     $('.collapse').each(function (index) {
@@ -57,11 +82,37 @@ function toggle_all(){
     expanded = 1 - expanded;
 };
 
+function show_hide_empty(){
+    show_empty = 1 - show_empty;
+    var snippets = $(".user_snippets");
+    snippets.each(function(index) {
+            if(snippets[index].getElementsByTagName("pre").length == 0){
+            if(show_empty == 0) {
+                $(this).hide();
+            } else {
+                $(this).show();
+            };
+        };
+    });
+    if(show_empty == 0) {
+        $("#show_hide_empty_btn").text("Show all");
+    } else {
+        $("#show_hide_empty_btn").text("Hide empty");
+    };
+}
 // For now show all
 toggle_all();
 
 $("#toggle_all").click(function(){
     toggle_all();
+});
+
+$("#show_hide_empty_btn").click(function(){
+    show_hide_empty();
+});
+
+$("#fetch_dated").click(function(){
+    window.location = "/tag/{{ tag }}?sd="+$("#start_date").val()+"&ed="+$("#end_date").val();
 });
 
 $("#select_count").change(function() {

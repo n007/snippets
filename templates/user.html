@@ -54,7 +54,7 @@
     {% if snippets %}
         {% for snippet in snippets %}
             <b>{{ snippet.date }}</b><br/>
-            <pre>{{ snippet.trimmed_text|urlize }}</pre>
+            <pre>{{ snippet.text|urlize }}</pre>
         {% endfor %}
     {% else %}
         No snippets found from {{user.pretty_name}} :(
