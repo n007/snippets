@@ -28,11 +28,13 @@
     <h2>Groups</h2>
     {% for tag in tags %}
         {{ tag.0|title}}&nbsp;
+        {% if user.email != current_user.email %}
 		    {% if tag.1 %}
 		      ✓ <a class="light" href="/unfollow?tag={{ tag.0 }}&continue=/user/{{ user.email }}">unfollow</a>
 		    {% else %}
 		      <a class="light" href="/follow?tag={{ tag.0 }}&continue=/user/{{ user.email }}">follow</a>
 		    {% endif %}
+        {% endif %}
     {% endfor %}
   </div>
 

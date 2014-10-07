@@ -40,7 +40,9 @@
                     <div style="float:left">
                     {{tag_group.name|title}}
                    <a href="/tag/{{ tag_group.name }}">[Snippets]</a>
-                   <a class="light" href="/unfollow?tag={{ tag_group.name }}&continue=/">[unfollow]</a>
+                   {% if tag_group.name not in current_user.tags.0 %}
+                       <a class="light" href="/unfollow?tag={{ tag_group.name }}&continue=/">[unfollow]</a>
+                   {% endif %}
                     </div>
                     <span class="badge" style="float:right">{{tag_group.users_following_count}}/{{tag_group.users|length}}</span>
               </td>
@@ -67,10 +69,12 @@
                 {% if tag_user.0.pretty_name != tag_user.0.user_id %}
                     ({{tag_user.0.user_id}})
                 {% endif %}
-                {% if tag_user.1 %}
-                    <a class="light" href="/unfollow?user={{ tag_user.0.email }}&continue=/">[unfollow]</a>
-                {% else %}
-                    <a class="light" href="/follow?user={{ tag_user.0.email }}&continue=/">[follow]</a>
+                {% if tag_group.name not in current_user.tags.0 %}
+                    {% if tag_user.1 %}
+                        <a class="light" href="/unfollow?user={{ tag_user.0.email }}&continue=/">[unfollow]</a>
+                    {% else %}
+                        <a class="light" href="/follow?user={{ tag_user.0.email }}&continue=/">[follow]</a>
+                    {% endif %}
                 {% endif %}
             </td></tr>
           {% endfor %}

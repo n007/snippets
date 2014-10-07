@@ -3,10 +3,12 @@
 {% block body %}
   <div style="float: left; width: 300px">
     <h2>{{ tag|title }}</h2>
-    {% if following %}
-      Status: following ✓ <a class="light" href="/unfollow?tag={{ tag }}&continue=/tag/{{ tag }}">unfollow</a>
-    {% else %}
-      Status: not following <a class="light" href="/follow?tag={{ tag }}&continue=/tag/{{ tag }}">follow</a>
+    {% if tag not in current_user.tags %}
+        {% if following %}
+          Status: following ✓ <a class="light" href="/unfollow?tag={{ tag }}&continue=/tag/{{ tag }}">unfollow</a>
+        {% else %}
+          Status: not following <a class="light" href="/follow?tag={{ tag }}&continue=/tag/{{ tag }}">follow</a>
+        {% endif %}
     {% endif %}
   </div>
 
