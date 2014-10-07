@@ -9,7 +9,6 @@ from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 from google.appengine.ext.webapp import util
 
 from dateutil import *
-from emails import *
 from model import *
 
 CONFIG = ConfigParser.RawConfigParser()
@@ -50,7 +49,7 @@ class ReceiveEmail(InboundMailHandler):
         for content_type, body in message.bodies('text/plain'):
             if body.encoding == '8bit':
                 body.encoding = '7bit'
-            content = extract_snippets_from_msg(body.decode(), user.user_id())
+            content = extract_snippets_from_msg(body.decode(), user)
             create_or_replace_snippet(user, content, date, wkly)
 
 
