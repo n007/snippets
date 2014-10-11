@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <div style="float:left">
+        <h4>Top active users</h4>
+        <div style="float:left">
+            <h5>Weekly Users</h5>
+            <ul>
+                {% for user in regular_weekly %}
+                    <li>{{user.pretty_name}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div style="margin-left:50px; float:left">
+            <h5>Daily Users</h5>
+            <ul>
+                {% for user in regular_daily%}
+                <li>{{user.pretty_name}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div style="margin-left:50px; float:left">
+        <h4>Users with this week's snippet pending</h4>
+        <ul>
+            {% for user in snippet_pending%}
+                <li>{{user.pretty_name}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

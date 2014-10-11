@@ -21,6 +21,11 @@ REMINDER_BODY = "Hey " + COMPANY_NAME + " Nerd,\n\n" + \
 "Folks want to know what you're up to. Don't leave 'em hanging. Please send a bulleted list of your work items on their way."
 
 
+def send_email(send_to, subject, body):
+    """Send an email."""
+    mail.send_mail(sender=EMAIL_SENDER, to=send_to, subject=subject, body=body)
+
+
 class ReminderEmail(webapp.RequestHandler):
     def get(self):
         all_users = User.all().filter("enabled =", True).fetch(NUM_USERS)

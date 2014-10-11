@@ -93,13 +93,13 @@ def date_for_globalconf_snippet():
 
 def date_for_weekly_snippet():
     #Return the most recent Monday
-    #If its Mon(0) or Tue(1) retrun previous Monday
+    #If its Mon(0) or Tue(1) return previous Monday
     today = datetime.datetime.now(SNIPPET_TZ).date()
     intday = today.weekday()
     if (intday <= 1):
         intday += 7
     snippet_day = today - datetime.timedelta(days=intday)
-    logging.info("date_for_weekly_snippet = %s", snippet_day)
+    #logging.info("date_for_weekly_snippet = %s", snippet_day)
     return snippet_day
 
 
@@ -110,7 +110,7 @@ def date_for_daily_snippet():
     snippet_day = today
     if (intday >= 5):
         snippet_day = today - datetime.timedelta(days=intday - 4)
-    logging.info("date_for_daily_snippet = %s", snippet_day)
+    #logging.info("date_for_daily_snippet = %s", snippet_day)
     return snippet_day
 
 
@@ -155,7 +155,7 @@ def date_for_daily_retrieval():
     elif(intday == 6):
         offset = 2
     snippet_day = today - datetime.timedelta(days=offset)
-    logging.info("date_for_daily_retrieval = %s", snippet_day)
+    #logging.info("date_for_daily_retrieval = %s", snippet_day)
     return snippet_day
 
 
@@ -173,10 +173,15 @@ def html5_parse_date(date_str):
 
 def get_today_date():
     """Return today's date in YYYY-MM-DD format."""
-    return datetime.datetime.now().date()
+    return datetime.datetime.now(SNIPPET_TZ).date()
 
 
-def get_week_before_date():
-    """Return 7 days previous date in YYYY-MM-DD format."""
-    today = datetime.datetime.now()
-    return (today - datetime.timedelta(days=7)).date()
+def get_past_date(days):
+    """Return date before given number of days in YYYY-MM-DD format."""
+    today = get_today_date()
+    return today - datetime.timedelta(days=days)
+
+
+def delta_days(days):
+    """Return a timedelta object for given days."""
+    return datetime.timedelta(days=days)

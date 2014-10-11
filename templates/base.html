@@ -7,7 +7,7 @@
    <link rel="stylesheet" href="/static/css/bootstrap.min.css"></link>
   <style>
     body.x { font-family: Courier New, monospaced; }
-    body {font-family: Helvetica; margin: 25px;}
+    body {font-family: Helvetica; margin: 0px 25px 0px 25px;}
     a.light { color: #AAA; text-decoration: none }
     a.light:hover { text-decoration: underline }
 	a.simple { color: #2398C9; text-decoration: none;}
@@ -18,15 +18,38 @@
 
 <body>
   <h1><a class="simple" href="/">Snippets</a> <small style="font-size:15px">{{current_user_details.company_name}}</small></h1>
-  <div style="float:right; margin-top: -25px;">
-    {% if current_user_details.user %}
-      Welcome {{ current_user_details.full_name }} [<a href="{{ current_user_details.logout_url }}">Logout</a>]
-    {% else %}
-      [<a href="{{current_user_details.login_url}}">Login</a>]
-    {% endif %}
+  <div style="margin-top:-25px">
+      <div style="float:right;">
+        {% if current_user_details.user %}
+          Welcome {{ current_user_details.full_name }} [<a href="{{ current_user_details.logout_url }}">Logout</a>]
+        {% else %}
+          [<a href="{{current_user_details.login_url}}">Login</a>]
+        {% endif %}
+      </div>
+      {% if current_user_details.user %}
+          <a href="/faq" style="float:right; margin-right:50px">FAQ</a>
+          <a href="/user_activity" style="float:right; margin-right:30px">User Stats</a>
+      {% endif %}
+      {% if current_user_details.admin_user %}
+          <div class="dropdown" style="float:right; margin-right:50px;">
+            <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" style="padding:0px">
+              Admin
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="/email_all">Email all</a></li>
+            </ul>
+          </div>
+      {% endif %}
   </div>
   <hr style="margin: 5px 0; clear:both">
-  {% block body %}
-  {% endblock %}
+  <div id="main_container" style="margin-bottom:10px">
+      {% block body %}
+      {% endblock %}
+  </div>
+  <!--div id="footer" style="clear:both; text-align:center; padding:5px">
+      <hr style="margin:5px">
+      <a href="http://rocketfuel.com">Rocket Fuel Inc</a>
+  </div-->
 </body>
 </html>

@@ -113,26 +113,26 @@ def extract_snippets_from_msg(content, user):
     #content = content.replace('<br>', '')
 
     # Strip signatures beginning with --
-    sig_pattern = re.compile(r'^\-\-\s*$', re.MULTILINE)
-    split_email = re.split(sig_pattern, content)
-    content = split_email[0]
+    pattern = re.compile(r'^\-\-\s*$', re.MULTILINE)
+    content = re.split(pattern, content)[0]
 
     # Should match "On Sat, Oct 4, 2014 at 6:15 AM, (snippets|userid@domain)
     pattern = (r'On [A-Z][a-z]{2}, [A-Z][a-z]{2} [0-9]{,2}, [0-9]{4} at '
                '.*(snippets|' + user_sig + ').*')
-    reply_pattern = re.compile(pattern, re.MULTILINE)
-    split_email = re.split(reply_pattern, content)
-    content = split_email[0]
+    re_pattern = re.compile(pattern, re.MULTILINE)
+    content = re.split(re_pattern, content)[0]
 
     # Strip signatures matching *<NAME> .. *
-    reply_pattern = re.compile(r'^\*.*' + user_sig + '.*', re.MULTILINE)
-    split_email = re.split(reply_pattern, content)
-    content = split_email[0]
+    re_pattern = re.compile(r'^\*.*' + user_sig + '.*', re.MULTILINE)
+    content = re.split(re_pattern, content)[0]
 
     # Strip signatures matching ~Name
-    pattern = r'^~({}|{}|{})$'.format(user.user_id(), user.pretty_name(),
+    pattern = r'^~({}|{}|{})\s*$'.format(user.user_id(), user.pretty_name(),
                                       user.first_name())
-    reply_pattern = re.compile(pattern, re.MULTILINE)
-    split_email = re.split(reply_pattern, content)
-    content = split_email[0]
+    re_pattern = re.compile(pattern, re.MULTILINE)
+    content = re.split(re_pattern, content)[0]
+
+    pattern = r'^(thanks|thx),?\s*$'
+    re_pattern = re.compile(pattern, re.MULTILINE|re.IGNORECASE)
+    content = re.split(re_pattern, content)[0]
     return content.strip()

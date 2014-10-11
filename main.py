@@ -1,8 +1,9 @@
-import os
+import datetime
 import functools
+import logging
+import os
 import urllib
 import ConfigParser
-import logging
 
 from google.appengine.api import users
 from google.appengine.ext import webapp
@@ -17,7 +18,13 @@ CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('configs/snippet.cfg')
 COMPANY_NAME = CONFIG.get('Global','company_name')
 NUM_USERS = CONFIG.getint('Global','num_users')
+ADMIN_USERS = CONFIG.get('Global','admin').split()
 DEFAULT_TAGLIST_COUNT = 3
+
+# Constants for generating usage statistics.
+MAX_SNIPPET_DELAY_DAYS = 3
+REGULAR_WEEKLY_WINDOW = 8
+REGULAR_DAILY_WINDOW = 20
 
 
 def is_rocketfuel_user(email_id):
@@ -26,6 +33,14 @@ def is_rocketfuel_user(email_id):
         return False
     email_domain = email_id.split('@')[1]
     return any([email_domain.endswith(domain) for domain in EMAIL_DOMAINS])
+
+
+def is_admin_user(email_id):
+    """Checks if the given email_id belongs to set of app admin."""
+    if not email_id:
+        return False
+    user_id = email_id.split('@')[0]
+    return user_id in ADMIN_USERS
 
 
 def authenticated(method):
@@ -40,6 +55,18 @@ def authenticated(method):
         elif not is_rocketfuel_user(user.email()):
             self.redirect('/login', permanent=True)
             return None
+        return method(self, *args, **kwargs)
+    return wrapper
+
+
+def requires_admin(method):
+    """Function decorator for forcing admin privileges."""
+    @authenticated
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        user = users.get_current_user()
+        if not is_admin_user(user.email()):
+            self.redirect('/', permanent=True)
         return method(self, *args, **kwargs)
     return wrapper
 
@@ -73,6 +100,7 @@ class BaseHandler(webapp.RequestHandler):
         user = self.get_user()
         data['full_name'] = user.pretty_name()
         data['user'] = user
+        data['admin_user'] = is_admin_user(user.email)
         return data
 
 
@@ -99,11 +127,8 @@ class UserLogin(BaseHandler):
 
     def get(self):
         """Handler for GET request. Force to login using company email id."""
-        logging.info('Authentication skipped yeahhh')
         user = users.get_current_user()
-        logging.info('Authentication skipped yeahhh 1')
         if not user:
-            logging.info('Authentication skipped yeahhh 1')
             self.redirect(users.create_login_url(), permanent=True)
         elif is_rocketfuel_user(user.email()):
             self.redirect('/', permanent=True)
@@ -219,7 +244,7 @@ class TagHandler(BaseHandler):
             all_snippets.append(data)
 
         all_snippets = sorted(all_snippets, key=lambda x:x['name'])
-        start_date = start_date or get_week_before_date()
+        start_date = start_date or get_past_date(7)
         end_date = end_date or get_today_date()
         template_values = {
                            'current_user' : user,
@@ -268,12 +293,69 @@ class MainHandler(BaseHandler):
 class FAQHandler(BaseHandler):
     #View this week's snippets in a given tag.
     @authenticated
-    def get(self, email):
-        user = self.get_user()
+    def get(self):
+        self.render('faq', {})
+
+
+class GenerateUserReport(BaseHandler):
+    """It prepares list of active, inactive users."""
+
+    @authenticated
+    def get(self):
+        """Generate lists and update db."""
+        starting_date_weekly_users = get_past_date(REGULAR_WEEKLY_WINDOW * 7)
+        starting_date_daily_users = get_past_date(REGULAR_DAILY_WINDOW)
+
+        snippets = Snippet.all().filter("date >=", starting_date_weekly_users).order("-date")
+        snippets = snippets.fetch(snippets.count())
+        users = User.all()
+        regular_daily, regular_weekly, snippet_pending = [], [], []
+        prev_week = date_for_weekly_snippet()
+        today = get_today_date()
+        for user in users:
+            user_snippets = sorted([s for s in snippets if s.user.email == user.email],
+                                   key=lambda x:x.date, reverse=True)
+            if user.weekly:
+                if len(user_snippets) == REGULAR_WEEKLY_WINDOW - 1:
+                    regular_weekly.append(user)
+                if (not user_snippets or (prev_week != user_snippets[0].date and
+                    today > prev_week + delta_days(MAX_SNIPPET_DELAY_DAYS))):
+                    snippet_pending.append(user)
+            elif not user.weekly:
+                user_snippets = [s for s in user_snippets
+                                 if s.date >= starting_date_daily_users]
+                if len(user_snippets) >= REGULAR_DAILY_WINDOW - 7:
+                    regular_daily.append(user)
+                if (not user_snippets == 0 or
+                    today > user_snippets[0].date + delta_days(MAX_SNIPPET_DELAY_DAYS)):
+                    snippet_pending.append(user)
         template_values = {
-                           'current_user' : user,
-                          }
-        self.render('faq', template_values)
+                'regular_daily': sorted(regular_daily, key=lambda x:x.pretty_name()),
+                'regular_weekly': sorted(regular_weekly, key=lambda x:x.pretty_name()),
+                'snippet_pending': sorted(snippet_pending, key=lambda x:x.pretty_name())}
+        self.render('user_activity', template_values)
+
+
+class EmailAllUsers(BaseHandler):
+    """Handler for emailing all the users."""
+
+    @requires_admin
+    def post(self):
+        """Send email to all the users."""
+        message = self.request.get('message')
+        subject = self.request.get('subject')
+        all_users = User.all()
+        user_list = []
+        for user in all_users:
+            if user.email == 'jkumar@rocketfuelinc.com':
+                send_email(user.email, subject, message)
+            user_list.append(user.user_id())
+        self.render('send_email', {'sent_to': user_list})
+
+    @requires_admin
+    def get(self):
+        """Render send email form."""
+        self.render('send_email', {})
 
 
 def main():
@@ -289,7 +371,9 @@ def main():
                                           ('/digestemail', DigestEmail),
                                           ('/onereminder', OneReminderEmail),
                                           ('/onedigest', OneDigestEmail),
-                                          ('/faq/(.*)', FAQHandler)],
+                                          ('/user_activity', GenerateUserReport),
+                                          ('/email_all', EmailAllUsers),
+                                          ('/faq', FAQHandler)],
                                           debug=True)
     util.run_wsgi_app(application)
 
