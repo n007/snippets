@@ -74,10 +74,12 @@ def requires_admin(method):
 class BaseHandler(webapp.RequestHandler):
     """Base handler class. All other classes should inherit this."""
 
+    user_db_obj = None
+
     @authenticated
-    def get_user(self):
-        """Return current user DB object. Authenticated wrapper ensures that
-        the user is logged in using an allowed domain."""
+    def get_or_add_user(self):
+        """We cannot afford to check/add user as it creates duplicate entries
+        due to late data write to datastore."""
         user = users.get_current_user()
         userObj = User.all().filter("email =", user.email()).fetch(1)
         if not userObj:
@@ -86,6 +88,14 @@ class BaseHandler(webapp.RequestHandler):
         else:
             userObj = userObj[0]
         return userObj
+
+    @authenticated
+    def get_user(self):
+        """Return current user DB object. Authenticated wrapper ensures that
+        the user is logged in using an allowed domain."""
+        if not self.user_db_obj:
+            self.user_db_obj = self.get_or_add_user()
+        return self.user_db_obj
 
     def _get_user_details(self):
         """Returns details for current user."""
@@ -316,7 +326,7 @@ class GenerateUserReport(BaseHandler):
             user_snippets = sorted([s for s in snippets if s.user.email == user.email],
                                    key=lambda x:x.date, reverse=True)
             if user.weekly:
-                if len(user_snippets) == REGULAR_WEEKLY_WINDOW - 1:
+                if len(user_snippets) >= REGULAR_WEEKLY_WINDOW - 1:
                     regular_weekly.append(user)
                 if (not user_snippets or (prev_week != user_snippets[0].date and
                     today > prev_week + delta_days(MAX_SNIPPET_DELAY_DAYS))):
@@ -347,8 +357,7 @@ class EmailAllUsers(BaseHandler):
         all_users = User.all()
         user_list = []
         for user in all_users:
-            if user.email == 'jkumar@rocketfuelinc.com':
-                send_email(user.email, subject, message)
+            send_email(user.email, subject, message)
             user_list.append(user.user_id())
         self.render('send_email', {'sent_to': user_list})
 

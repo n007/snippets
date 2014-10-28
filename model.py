@@ -117,8 +117,7 @@ def extract_snippets_from_msg(content, user):
     content = re.split(pattern, content)[0]
 
     # Should match "On Sat, Oct 4, 2014 at 6:15 AM, (snippets|userid@domain)
-    pattern = (r'On [A-Z][a-z]{2}, [A-Z][a-z]{2} [0-9]{,2}, [0-9]{4} at '
-               '.*(snippets|' + user_sig + ').*')
+    pattern = (r'On.*[0-9]{4}.*(AM|PM).*(snippets|' + user_sig + ').*')
     re_pattern = re.compile(pattern, re.MULTILINE)
     content = re.split(re_pattern, content)[0]
 

@@ -5,7 +5,7 @@
         <div class="alert alert-success" role="alert" style="width:500px">Email successfully sent to {{sent_to|length}} users.</div>
     {% endif %}
     <h2> Compose email to all users </h2>
-    <h5 style="color:red">Avoid sending unnecessary emails!!</h5>
+    <h5 style="color:red">Hey Admin, don't spam ;)</h5>
     <form action="#" method="POST">
         <label class="text">
             Subject
@@ -15,6 +15,14 @@
             Content
             <textarea type="textarea" style="width:300px" rows="5" name="message" placeholder="Body of email"></textarea>
         </label>
-        <button type="submit" class="btn" style="align:right">Send Email</button>
+        <button id="send_email" type="submit" class="btn" style="align:right">Send Email</button>
     </form>
+
+<script>
+    $(document).ready(function() {
+        $("#send_email").click(function() {
+            return confirm("Are you sure you want to send this email?");
+        });
+    });
+</script>
 {% endblock %}

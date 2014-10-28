@@ -3,7 +3,7 @@ Develop/test changes on your local system
 1. Install Google App Engine SDK
 2. Checkout the code from git repo
 3. Download latest data from current deployed application:
-`appcfg.py download_data -vvvv --url=https://<app_name>.appspot.com/_ah/remote_api --filename=/tmp/snippetdb`
+`appcfg.py download_data -vvvv --url=https://noted-tesla-574.appspot.com/_ah/remote_api --filename=/tmp/snippetdb`
 For this command to work correctly, make sure remote_api is enabled. For this you will need to add following lines to app.yaml
 
 ==================
